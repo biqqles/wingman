@@ -1,0 +1,3 @@
+# show statistics only for the package itself
+* linguist-vendored
+src/wingman/* linguist-vendored=false

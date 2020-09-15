@@ -1,0 +1,128 @@
+[align=justify][color=#c9ced1][font=Open Sans][b][hrc]#1D3C5C[/hrc][/b][color=#66CCFF][float=right][img=90x90]https://i.imgur.com/Wlowwfn.png[/img][/float]
+[font=Oswald][size=xx-large][b]Wingman v0.1[/b] (Public Beta)[/size][/font][/color]
+[color=#ffffff][i][size=large]A companion for Discovery Freelancer.[/size][/i][/color]
+
+[b][color=#c0c0c0]Jump to: [a=download]Downloads[/a] | [a=gallery]Screenshots[/a] | [url=https://github.com/biqqles/wingman/]Code[/url][/color][/b][hrc]#1D3C5C[/hrc]
+
+[anchor=introduction][sp2][a=introduction][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Introduction[/color][/size][pi amount=3]
+
+[b]Wingman[/b] is a powerful desktop companion application specifically crafted for Discovery Freelancer. Intended to be a modern addition to the venerable [url=http://adoxa.altervista.org/freelancer/tools.html#flstat]FLStat[/url] and [url=http://wiz0u.free.fr/prog/flc/]Freelancer Companion[/url], it seeks to bring a wealth of new features to the community.
+
+[b]Wingman features:[/b]
+[list]
+[*] [i]Navmap:[/i] a beautiful navigation aid integrating and extending @"Error"'s [url=https://github.com/AudunVN/Navmap]Online Navmap[/url]
+[*] [i]Merchant:[/i] a powerful trading assistant
+[*] [i]Roster:[/i] a record of your in-game characters and their attributes
+[*] [i]Database:[/i] an information-dense overview of the game's world
+[*] Augmentation of the game client, including clipboard access, named screenshots and new commands
+[*] Display of infocards with full rich text formatting, and TGA icons
+[*] Full cross-platform support, with downloads for Windows and Linux
+[/list]
+
+See [url=https://github.com/biqqles/wingman#launchpad]here[/url] for a list of features I am currently planning on adding in future. Please feel free to make your own suggestions! Wingman is intended to be community-led.
+
+Wingman is free software, released under the GNU General Public License, version 3.0.
+
+
+[/pi][anchor=download][sp2][a=download][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Downloads & installation[/color][/size][pi amount=1]
+
+[list]
+[*] [size=medium][color=#FFB600]Windows 7+[/color][/size]
+The application is built as a self-contained executable on Windows:
+
+
+[list]
+[*] [b]Download and run the installer:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1/wingman-0.1-setup.exe][font=monospace]wingman-0.1-setup.exe[/font] (50.3 MB)[/url]
+[*] [b]Or download a portable distribution:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1/wingman-0.1-portable.zip][font=monospace]wingman-0.1-portable.zip[/font] (68.5 MB)[/url]
+[/list]
+
+[u]On Windows, administrative privileges are required[/u] to read the process memory of, and inject keyboard input into, Freelancer, so the application will ask for them before launching. I hope to improve this experience in future by restarting when features requiring these permissions are turned on.
+
+
+[*] [size=medium][color=#FFB600]Linux[/color][/size]
+Python 3.7 or higher is must be installed. Assuming your Python 3.7+ executable is available as [font=monospace][color=#91ad9f]python3[/color][/font],
+
+
+[list]
+[*] [b]Install using:[/b] [font=monospace][color=#91ad9f]python3 -m pip install wingman[/color][/font]
+[*] [b]Uninstall using:[/b] [font=monospace][color=#91ad9f]python3 -m pip uninstall wingman[/color][/font]
+[/list]
+
+[/list]
+
+[/pi][pi amount=3]Additional details and more installation options are available on [url=https://github.com/biqqles/wingman#installation]GitHub[/url]. Build instructions are also included in that document. Old versions, and repository snapshots, can be found at [url=https://github.com/biqqles/wingman/releases/]Releases[/url].
+
+
+[/pi][anchor=gallery][sp2][a=gallery][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Gallery[/color][/size][pi amount=3]
+
+[align=center][spoiler=Click on an image to view it in full size]
+[table]
+[tr]
+[td][url=https://i.imgur.com/U2PSH5s.png][img=480x290]https://i.imgur.com/U2PSH5s.png[/img][/url]
+[size=8]
+Navmap[/size][/td]
+[td][url=https://i.imgur.com/OT9tPBr.png][img=480x295]https://i.imgur.com/OT9tPBr.png[/img][/url]
+[size=8]Running in KDE Plasma 5.10 (for details of my setup see [url=https://discoverygc.com/forums/showthread.php?tid=3019&pid=1934163#pid1934163]here[/url])[/size][/td]
+[/tr]
+[tr]
+[td][url=https://i.imgur.com/ErErW6B.png][img=480x295]https://i.imgur.com/ErErW6B.png[/img][/url]
+[size=8]
+Navmap context menu[/size][/td]
+[td][url=https://i.imgur.com/ErErW6B.png][img=480x295]https://i.imgur.com/ErErW6B.png[/img][/url]
+[size=8]Universe map [TODO][/size][/td]
+[/tr]
+[tr]
+[td][url=https://i.imgur.com/T8fMRVb.png][img=480x295]https://i.imgur.com/T8fMRVb.png[/img][/url]
+[size=8]
+Merchant[/size][/td]
+[td][url=https://i.imgur.com/T8fMRVb.png][img=480x295]https://i.imgur.com/T8fMRVb.png[/img][/url]
+[size=8]
+Roster[/size][/td]
+[/tr]
+[tr]
+[td][url=https://i.imgur.com/98JDULq.png][img=480x284]https://i.imgur.com/98JDULq.png[/img][/url]
+[size=8]
+Database[/size][/td]
+[td][url=https://i.imgur.com/BvHUqdZ.png][img=480x284]https://i.imgur.com/BvHUqdZ.png[/img][/url]
+[size=8]
+Database: Commodities[/size][/td]
+[/tr]
+[/table][/align]
+[/spoiler]
+
+
+
+[/pi][anchor=bugs][sp2][a=bugs][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Reporting bugs[/color][/size][pi amount=3]
+
+[b]This is a beta. There will be bugs![/b] You can report them in two ways: opening an [url=https://github.com/biqqles/wingman/issues]issue on GitHub[/url] or using the form below if you do not have an account:
+
+[code]
+[quote=Bug report]
+[b]Operating system: [/b]
+[b]Wingman version: [/b]
+[b]Steps to reproduce: [/b]
+[b]What did you expect to happen?: [/b]
+[b]What happened?: [/b]
+[/quote]
+[/code]
+
+If the bug causes the application to crash, add [font=monospace][color=#91ad9f]wingman.log[/color][/font] as an attachment to your post or issue. On Windows you can find this file in [font=monospace][color=#91ad9f]%USERPROFILE%\AppData\Local\wingman[/color][/font].
+
+In either case, please check that the exact bug has not been listed already in this thread or in [url=https://github.com/biqqles/wingman/issues]issues[/url] to avoid duplicate reports.
+
+If the application crashes immediately when it starts, the first thing to try is deleting [font=monospace][color=#91ad9f]wingman.cfg[/color][/font] in the above directory. Even if this resolves the issue, please still submit a bug report explaining what led up to the crash!
+
+Because this is a beta, it's a good idea to back up your character information in Roster periodically if you want to hold on to this information. You can do this using the Export button.
+
+
+[/pi][anchor=thanks][sp2][a=thanks][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Acknowledgements[/color][/size][pi amount=3]
+
+Thanks to:[list]
+[*] [b] @"Syrus" [/b] for the original inspiration for the nucleus of this project
+[*] [b] @"Error" [/b] for the kind use of their [url=http://space.discoverygc.com/navmap/]Online Navmap[/url] (and implementing a flag to let Wingman use it more effectively)
+[*] Everyone who took the time to answer my [url=http://discoverygc.com/forums/showthread.php?tid=146656]survey[/url] (yes, this really has been in development for that long), which generated many ideas that made their way into the project
+[*] This application uses the following open source projects: [url=https://www.python.org/]Python[/url], [url=https://riverbankcomputing.com/software/pyqt/intro]PyQt5[/url], [url=https://www.pyinstaller.org]PyInstaller[/url], [url=https://pillow.readthedocs.io/en/stable/]Pillow[/url], [url=https://pypi.org/project/ago/]ago[/url]
+[/list]
+Project icon made by [url=https://www.flaticon.com/authors/roundicons]Roundicons[/url] from www.flaticon.com.
+[/pi]
+[/font][/color][/align]

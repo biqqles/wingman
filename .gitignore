@@ -1,0 +1,18 @@
+# Dolphin and PyCharm files and directories
+.directory
+.idea/
+
+# build directories
+build
+dist
+*.egg-info
+
+# backups
+*.backup
+
+# runtime directories
+cache
+__pycache__
+
+# compiled Qt resources
+src/wingman/resources.py
