@@ -24,12 +24,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import flint as fl
 
 from ...widgets.pathedit import PathEdit
-from ... import IS_WIN, config, app
+from ... import IS_WIN, config
 
 
 class ConfigurePaths(QtWidgets.QDialog):
     """A dialogue that allows the paths needed by the application to be configured."""
-    title = f'Configure paths'
+    title = 'Configure paths'
 
     def __init__(self, mandatory=False):
         super().__init__()
@@ -87,4 +87,4 @@ class ConfigurePaths(QtWidgets.QDialog):
     def closeEvent(self, event: QtGui.QCloseEvent):
         """If the dialogue is mandatory, quit the application."""
         if self.mandatory and not self.allPathsValid():
-            app.quit(1)
+            sys.exit(1)
