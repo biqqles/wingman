@@ -33,13 +33,14 @@ class PathEdit(QtWidgets.QWidget):
         self.setLayout(self.mainLayout)
 
         self.lineEdit = QtWidgets.QLineEdit()
-        self.lineEdit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        self.lineEdit.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.lineEdit.setMinimumWidth(300)
         self.lineEdit.textChanged.connect(self.onTextChanged)
         self.lineEdit.setText(initialPath)
         self.mainLayout.addWidget(self.lineEdit)
 
         self.browseButton = QtWidgets.QPushButton('Browse')
-        self.browseButton.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.browseButton.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         self.browseButton.clicked.connect(self.onBrowseButtonClicked)
         self.mainLayout.addWidget(self.browseButton)
 
