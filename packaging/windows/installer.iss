@@ -22,8 +22,6 @@ OutputBaseFilename=wingman-setup
 SetupIconFile=..\..\icons\general\wingman.ico
 Compression=lzma
 SolidCompression=yes
-; Wingman needs admin rights to inject to keyboard input into Freelancer and read its process memory
-PrivilegesRequired=admin
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

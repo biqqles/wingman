@@ -31,7 +31,7 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           console=False,
-          uac_admin=True,
+          uac_admin=False,
           icon=os.path.join(ROOT, 'icons', 'general', 'wingman.ico'))
           
 coll = COLLECT(exe,

@@ -19,7 +19,7 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file initialises the application.
 """
 __app__ = 'Wingman'
-__version__ = 'v0.1.0'
+__version__ = 'v0.1.1'
 __description__ = 'A companion for Discovery Freelancer'
 
 import os
@@ -35,10 +35,8 @@ try:
     # noinspection PyUnresolvedReferences
     import flair
     IS_WIN = True
-    IS_ADMIN = flair.IS_ADMIN
 except ImportError:
     IS_WIN = False
-    IS_ADMIN = False
 
 # paths relative to app data directory
 NAVMAP_DIR = 'navmap'
