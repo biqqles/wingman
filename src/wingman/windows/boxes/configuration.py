@@ -35,12 +35,13 @@ class ConfigurePaths(QtWidgets.QDialog):
         super().__init__()
         self.mandatory = mandatory
         self.setWindowTitle(self.title)
-        self.setFixedSize(450, 160)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setWindowFlags(QtCore.Qt.Dialog)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Maximum)
 
         self.mainLayout = QtWidgets.QVBoxLayout()
+        self.mainLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.setLayout(self.mainLayout)
 
         self.formLayout = QtWidgets.QFormLayout()
