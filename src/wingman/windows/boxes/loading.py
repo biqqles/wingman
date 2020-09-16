@@ -44,8 +44,13 @@ class LoadingFiles(QtWidgets.QProgressDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Reading game data')
-        self.setFixedSize(300, 100)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+
+        # QProgressDialog claims to "return a size that fits the contents of the progress dialog" but this is
+        # absolutely not the case. As a hack, but not one that's too bad, increase its suggested size by ~50%
+        self.setMinimumWidth(int(self.width() * 1.5))
+
         self.setRange(0, 0)
         self.setMinimumDuration(0)
         self.show()
