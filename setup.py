@@ -6,10 +6,6 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from setuptools import setup, find_namespace_packages
-import subprocess
-
-# freshly compile resources
-subprocess.call(['pyrcc5', 'src/resources.qrc', '-o', 'src/wingman/resources.py'])
 
 
 setup(
@@ -44,6 +40,7 @@ setup(
         'ago',
         'Pillow',
         'PyQt5',
+        'PyQtWebEngine',
     ],
 
     entry_points={
