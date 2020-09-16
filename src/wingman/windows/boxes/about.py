@@ -24,19 +24,22 @@ from ... import icons, __app__, __version__, __description__
 
 class About(QtWidgets.QDialog):
     """The "About" message box."""
-    title = f'About'
+    title = 'About'
+    vMargin = 30
+    hMargin = 80
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle(self.title)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-        self.setFixedSize(530, 460)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
         self.mainLayout = QtWidgets.QVBoxLayout()
         self.setLayout(self.mainLayout)
         self.mainLayout.setAlignment(QtCore.Qt.AlignHCenter)
-        
+        self.mainLayout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
+        self.mainLayout.setContentsMargins(QtCore.QMargins(self.hMargin, self.vMargin, self.hMargin, self.vMargin))
+
         self.iconLabel = QtWidgets.QLabel()
         self.iconLabel.setPixmap(icons.main.pixmap(128, 128))
         self.iconLabel.setAlignment(QtCore.Qt.AlignHCenter)
