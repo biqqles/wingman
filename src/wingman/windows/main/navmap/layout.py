@@ -25,6 +25,7 @@ from .... import icons, IS_WIN
 
 
 class NavmapTab(QtWidgets.QWidget):
+    """Defines the layout of the 'Navmap' tab."""
     title = 'Navmap'
     icon = icons.navmap
 
@@ -57,7 +58,9 @@ class NavmapTab(QtWidgets.QWidget):
         self.selectionLayout.addWidget(self.gotoRadioButton)
 
         self.searchEdit = QtWidgets.QLineEdit(self)
-        self.searchEdit.setStyleSheet('font:bold')
+        searchFont = self.searchEdit.font()
+        searchFont.setBold(True)
+        self.searchEdit.setFont(searchFont)
         self.searchEdit.setPlaceholderText('Enter a system or base')
         self.searchEdit.setMinimumHeight(30)
         self.selectionLayout.addWidget(self.searchEdit)
@@ -71,4 +74,3 @@ class NavmapTab(QtWidgets.QWidget):
         self.rightLayout.addWidget(self.infocard)
 
         self.mainLayout.addLayout(self.rightLayout, 0, 1)
-
