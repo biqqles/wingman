@@ -26,10 +26,11 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Development Status :: 3 - Beta',
         'Operating System :: OS Independent',
         'Topic :: Games/Entertainment',
         'Intended Audience :: End Users/Desktop',
-        'Development Status :: 3 - Alpha'
+        'Environment :: X11 Applications :: Qt',
     ],
 
     python_requires='>=3.7',
