@@ -21,7 +21,7 @@ This file defines the interface of the application's main window.
 from typing import Callable, Union
 import logging
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from flint import cached
 
 from ... import config, __app__
@@ -79,14 +79,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Menubar
 
         self.menubar = QtWidgets.QMenuBar()
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1060, 35))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.menubar.sizePolicy().hasHeightForWidth())
-        self.menubar.setSizePolicy(sizePolicy)
-        # self.menubar.setNativeMenuBar(True)
-
         self.setMenuBar(self.menubar)
 
         self.menubar.addMenu(menus.Utilities(self.menubar))
