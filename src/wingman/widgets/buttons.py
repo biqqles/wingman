@@ -21,29 +21,26 @@ from PyQt5 import QtWidgets
 from .. import icons, IS_WIN
 
 
-class SquareButton(QtWidgets.QPushButton):
-    """A button whose width is fixed to its height, so that it expands to the maximum possible size while remaining
-    square. """
+class SquareButton(QtWidgets.QToolButton):
+    """A button whose width is fixed to its height, so that it always remains square, while adjusting its side length
+    to match its layout."""
 
-    def __init__(self, text='', tooltip='', icon=None, dropdown=False, edge=36, parent=None):
+    def __init__(self, text='', tooltip='', icon=None, edge=0, parent=None):
         """Initialise the widget with parameters passed to constructor."""
-        super().__init__()
+        super().__init__(parent)
         self.setText(text)
         self.setToolTip(tooltip)
         if icon:
             self.setIcon(icon)
-        self.setParent(parent)
 
-        policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-        self.setSizePolicy(policy)
-        self.setMinimumSize(edge, edge)
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum))
+        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.setStyleSheet('QToolButton::menu-indicator { width: 0 }')  # hide dropdown arrow indicator
+        if edge:
+            self.setMinimumSize(edge, edge)
 
         if IS_WIN:  # symbols are weirdly small in Segoe UI
-            self.setStyleSheet('QPushButton {font-size: 18px;}')
-
-        if dropdown:
-            # hide dropdown arrow indicator
-            self.setStyleSheet('QPushButton { padding-right: -0.5px } QPushButton::menu-indicator { image: none }')
+            self.setStyleSheet(self.styleSheet() + 'QToolButton { font-size: 18px }')
 
     def resizeEvent(self, event):
         """Handle a resize event so that the widget stays square."""
@@ -55,5 +52,4 @@ class UniverseMapButton(SquareButton):
 
     def __init__(self, parent=None):
         """Initialise a SquareButton with some default values."""
-        super().__init__(icon=icons.universemap, tooltip='Open universe map', parent=parent)
-        # self.setFixedHeight(QtWidgets.QComboBox().height())
+        super().__init__(tooltip='Open universe map', icon=icons.universemap, parent=parent)
