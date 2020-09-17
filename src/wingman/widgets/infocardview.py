@@ -16,27 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+from .. import app
 
 
 class InfocardView(QtWidgets.QTextEdit):
     """A widget configured to display HTML-formatted infocards."""
-
     def __init__(self, parent=None):
-        super().__init__()
-        if parent:
-            self.setParent(parent)
+        super().__init__(parent)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.setReadOnly(True)
 
     def contextMenuEvent(self, event):
-        """Show a context menu containing an action which copies the selected text to the clipboard, or the entire card if there
-        isn't any."""
-        selected = self.textCursor().selectedText()
-        text = selected if selected else self.toPlainText()
+        """Show a context menu containing an action which copies the selected text to the clipboard, or the entire
+        card if there isn't any."""
+        text = self.textCursor().selectedText() or self.toPlainText()
+
         menu = QtWidgets.QMenu()
         copy = menu.addAction('Copy')
-        copy.triggered.connect(lambda: app.clipboard().setText(text))
         copy.setIcon(QtGui.QIcon.fromTheme('edit-copy'))
-        copy.setShortcut(QtGui.QKeySequence('Ctrl+C'))
+        copy.setShortcut('Ctrl+C')
+        copy.triggered.connect(lambda: app.clipboard().setText(text))
+
         menu.exec(QtGui.QCursor.pos())
