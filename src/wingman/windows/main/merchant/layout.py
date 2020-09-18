@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from ....widgets import buttons
 from .... import icons
@@ -49,9 +49,6 @@ class MerchantTab(QtWidgets.QWidget):
         self.controlsLayout.addSpacing(25)
         self.swapButton = buttons.SquareButton('⇆', parent=self)  # todo: turn this into an icon
         self.swapButton.setToolTip('Swap systems')
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        self.swapButton.setFont(font)
         self.controlsLayout.addWidget(self.swapButton)
 
         self.controlsLayout.addSpacing(25)
