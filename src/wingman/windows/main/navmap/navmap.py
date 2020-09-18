@@ -61,7 +61,7 @@ class Navmap:
         self.mapView.expandB.clicked.connect(self.displayExpandedMap)
         self.widget.universeButton.clicked.connect(self.displayUniverseMap)
 
-        self.mapView.setDisplayed(self.currentlyDisplayed.name())
+        self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentlyDisplayed.name()))
         self.onURLChange(self.currentlyDisplayed.nickname)
 
         if IS_WIN:
@@ -83,22 +83,21 @@ class Navmap:
                 self.searchableEntities += system.contents()  # load system contents
                 self.mapView.displayConnMenu(system)
             self.config['last'] = nickname
-        self.mapView.executeJS('wingman.onDisplayChanged()')
 
     def onSearchTextEdited(self, query: str):
         """Handle the search field's text being edited by the user."""
         self.widget.gotoRadioButton.setChecked(True)
-        self.mapView.displayMap(query)
+        self.mapView.displayName(query)
 
     def onFollowModeEnabled(self):
         """Handle follow mode being enabled."""
         if flair.state.system is not None:
-            self.mapView.displayMap(flair.state.system)
+            self.mapView.displayName(flair.state.system)
 
     def onFlairSystemChanged(self, system: str):
         """Handle a system_changed event from flair."""
         if self.widget.followRadioButton.isChecked():
-            self.mapView.displayMap(system)
+            self.mapView.displayName(system)
 
     def displayInfocard(self, subject: str):
         """Displays an infocard for the given subject, where subject is a nickname"""

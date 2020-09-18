@@ -16,11 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-import os
 from collections import defaultdict
+import os
+from functools import partial
 
-import flint as fl
 from PyQt5 import QtWebEngineWidgets, QtCore, QtWidgets, QtGui
+import flint as fl
 
 from ..buttons import SquareButton
 from ... import config, icons, NAVMAP_DIR
@@ -29,53 +30,25 @@ DEV_JS_PATH = './widgets/mapview/navmap.js'
 
 
 class MapView(QtWebEngineWidgets.QWebEngineView):
-    """
-    A widget that attempts to display Space's Interactive Navmap <http://space.discoverygc.com/navmap/> in such a way
-    that it is seamlessly integrated into the native application.
-    """
+    """A widget that attempts to display Space's Online Navmap <http://space.discoverygc.com/navmap/> in such a way
+    that it is seamlessly integrated into the native application."""
     navmapReady = QtCore.pyqtSignal(name='navmapReady')
     loadCompleted = QtCore.pyqtSignal(str, name='loadCompleted')
 
-    # noinspection PyArgumentList
     def __init__(self, parent=None, url=config.navmap):
         """Initialise the widget."""
-        QtWebEngineWidgets.QWebEngineView.__init__(self)
-        self.page().profile().setCachePath(NAVMAP_DIR)  # link cache directory
-        self.setHtml('<body style="background-color: transparent"></body>')  # in case the page doesn't load
-        self.setUrl(QtCore.QUrl(url))
+        super().__init__(parent)
+
         self.setMinimumSize(512, 512)
-        # Resize while maintaining aspect ratio. After much experimenting this policy and the contents of resizeEvent
-        # were the best I could come up with. It's not ideal, though - it doesn't handle ExpandedMap being maximised.
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHeightForWidth(True)
-        sizePolicy.setRetainSizeWhenHidden(True)
-        self.setSizePolicy(sizePolicy)
+        self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding,
+                                                 QtWidgets.QSizePolicy.MinimumExpanding))
 
-        self.hide()  # hide until navmap initialised - this prevents a white flash
+        # set a placeholder page while the navmap loads
+        # interestingly adding or omitting !r (repr) from the colour changes what gets displayed
+        self.setHtml(f'<body style="background-color: {self.getBackgroundColour().name()}"></body>')
 
-        if parent:
-            self.setParent(parent)
-
-        self.executeJS = self.page().runJavaScript  # create a more convenient alias
-
-        # load JavaScript from resources, or from a file if it exists (useful for debugging)
-        if os.path.isfile(DEV_JS_PATH):
-            js = open(DEV_JS_PATH).read()
-        else:
-            jsFile = QtCore.QFile(':/javascript/navmap.js')
-            if jsFile.open(QtCore.QIODevice.ReadOnly | QtCore.QFile.Text):
-                js = QtCore.QTextStream(jsFile).readAll()
-            else:
-                raise FileNotFoundError("MapView: couldn't load hook.")
-
-        # inject script and call initialiseNavmap when ready
-        script = QtWebEngineWidgets.QWebEngineScript()
-        script.setSourceCode(js)
-        script.setName('navmap.js')
-        script.setWorldId(QtWebEngineWidgets.QWebEngineScript.MainWorld)
-        script.setInjectionPoint(QtWebEngineWidgets.QWebEngineScript.DocumentReady)
-        self.page().scripts().insert(script)
-
+        # load the real page
+        self.mainPage = self.createPage(url)
         self.waitForHookLoaded()
 
         # create control panel
@@ -95,82 +68,65 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         controlsLayout.addWidget(self.expandB)
         self.controlsFrame.setLayout(controlsLayout)
         self.controlsFrame.show()
+        self.controlsFrame.lower()
 
-        # create context menu actions I tried for ages to get these options to be persistent, but among other issues
-        # Qt would not emit the toggled signal when setChecked was called with the parameter set to False! In the end
-        # I just dropped it, so all options will just default to ON when the application is initialised
-
+        # create context menu
         self.menu = QtWidgets.QMenu()
-
-        sendState = lambda selector: lambda state: self.executeJS(
-            'wingman.setState({}, {})'.format(selector, str(state).lower()))
-
         self.showLabels = QtWidgets.QAction('Show labels', checkable=True, checked=True)
-        self.showLabels.toggled.connect(sendState('wingman.showLabels'))
+        self.showLabels.toggled.connect(partial(self.setState, 'wingman.showLabels'))
         self.showZones = QtWidgets.QAction('Show nebulae', checkable=True, checked=True)
-        self.showZones.toggled.connect(sendState('wingman.showZones'))
+        self.showZones.toggled.connect(partial(self.setState, 'wingman.showZones'))
         self.showWrecks = QtWidgets.QAction('Show wrecks', checkable=True, checked=True)
-        self.showWrecks.toggled.connect(sendState('wingman.showWrecks'))
+        self.showWrecks.toggled.connect(partial(self.setState, 'wingman.showWrecks'))
 
         self.menu.addActions([self.showLabels, self.showWrecks, self.showZones])
         self.menu.addAction('Save map as image').triggered.connect(self.saveAsImage)
 
         # configure settings
-        settings = self.page().view().settings()
-        settings.setAttribute(QtWebEngineWidgets.QWebEngineSettings.SpatialNavigationEnabled, True)
-        settings.setAttribute(QtWebEngineWidgets.QWebEngineSettings.ShowScrollBars, False)
+        self.settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.SpatialNavigationEnabled, True)
+        self.settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.ShowScrollBars, False)
 
         # initialise history
         self.backStack = []
         self.forwardsStack = []
 
-    def initialiseNavmap(self):
-        """Inject Wingman's code into the web app and change its background colour to blend in with the rest of the
-        interface. """
-        # Change background colour to that of window. This is the colour that will be shown when the web app is
-        # loading. I found that whatever I tried, even pulling pixels(!), I could not get Qt to return the actual,
-        # displayed colour of the QTabWidget (m.tw). This seems to be a known issue (see
-        # <https://stackoverflow.com/a/23020483>) with no published, easy workaround. Unfortunately, we cannot set
-        # the background to Qt.transparent because of a bug which prevents other widgets from being placed on top,
-        # see comments at <goo.gl/pz5w5M>. n.b. if this is ever fixed, self.setAttribute(
-        # QtCore.Qt.WA_TranslucentBackground) is required as well.
-
-        # get and set background colour of background widget
-        backgroundWidget = self.parentWidget() if self.parentWidget() else QtWidgets.QWidget()
-        colour = backgroundWidget.palette().color(backgroundWidget.backgroundRole())
-        self.page().setBackgroundColor(colour)
-        self.page().runJavaScript(f'wingman.setBackgroundColour({colour.name()!r})')
+    def onHookLoaded(self):
+        """After the hook has been loaded, perform final modifications to the navmap, make any necessary connections
+        and signal that the navmap is fully ready."""
+        self.setPage(self.mainPage)
+        self.page().runJavaScript(f'wingman.setBackgroundColour({self.getBackgroundColour().name()!r})')
 
         self.history().clear()  # a fresh start is always nice!
-
+        self.controlsFrame.raise_()
         self.urlChanged.connect(self.onUrlChange)
-
-        if self.parentWidget():
-            self.show()
         self.navmapReady.emit()
 
     def onUrlChange(self):
         """Handle a URL change. Wait for the variable to set, then emit loadCompleted."""
-        self.page().runJavaScript('currentSystemNickname', lambda n: self.loadCompleted.emit(n) if n != 'Sirius' else 0)
-
+        self.page().runJavaScript('wingman.onDisplayChanged()')
         # update state of forward/backward navigation buttons and history queue
         if self.getDisplayed() and '_' not in self.getDisplayed():
             if not self.backStack or self.getDisplayed() != self.backStack[-1]:
                 self.backStack.append(self.getDisplayed())
-
+        
         self.backB.setEnabled(bool(len(self.backStack) - 1))
         self.forwardB.setEnabled(bool(self.forwardsStack))
+        
+        # get the nickname of the currently displayed entity and emit loadCompleted if required
+        self.page().runJavaScript('currentSystemNickname', 
+                                  lambda n: self.loadCompleted.emit(n) if n != 'Sirius' else None)
 
     def displayEntity(self, entity: fl.entities.Entity):
         """Change the displayed object (system or solar) to the given item."""
-        self.displayMap(entity.name())
+        self.displayName(entity.name())
 
-    def displayMap(self, entityName: str):
-        self.executeJS(f'wingman.displayMap({entityName.title()!r})')
+    def displayName(self, name: str):
+        """Attempt to display a map for `entityName`."""
+        self.page().runJavaScript(f'wingman.displayMap({name.title()!r})')
 
     def displayUniverse(self):
         """Display universe map."""
-        self.executeJS("wingman.displayUniverseMap()")
+        self.page().runJavaScript("wingman.displayUniverseMap()")
 
     def getDisplayed(self):
         """Parse URL to resolve selected object (system/base/planet) name, or 'Sirius' if the universe map is
@@ -188,9 +144,13 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         self.setUrl(url)
         self.onUrlChange()
 
+    def setState(self, selector: str, state: bool):
+        """Set the state of a switch in the navmap using its selector."""
+        self.page().runJavaScript(f'wingman.setState({selector}, {str(state).lower()})')
+
     def displayConnMenu(self, forSystem: fl.entities.System):
         """Add a menu of connected systems, sorted by system name. Clicking on these systems will display that
-        system. """
+        system."""
         menu = QtWidgets.QMenu()
         menu.setToolTipsVisible(True)
 
@@ -212,19 +172,21 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
                                                      'Save map as image',
                                                      defaultPath,
                                                      'Portable Network Graphics image (*.png)')[0]
-        # Hide controls. Consider also temporarily setting the background to colour of forums (#090909) so it blends
-        # in well
+
+        # draw the image, hiding the controls and restoring them afterwards
+        # consider also temporarily setting the background to colour of forums (#090909) so it blends in well
         self.controlsFrame.hide()
-        # draw image
+
         image = QtGui.QImage(self.geometry().width(), self.geometry().height(), QtGui.QImage.Format_ARGB32)
         painter = QtGui.QPainter()
         painter.begin(image)
-        self.page().view().render(painter)
+        self.render(painter)
         painter.end()
+
+        self.controlsFrame.show()
 
         if path:
             image.save(path)
-        self.controlsFrame.show()
 
     def contextMenuEvent(self, event):
         """Provides a context menu that contains options to change the display settings of the map and save it as an
@@ -233,24 +195,63 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
     def resizeEvent(self, event):
         """Handle a resize event so that the widget stays square."""
-        self.setMaximumWidth(self.height())
+        self.setFixedWidth(self.height())
         self.controlsFrame.move(self.width() - 30, 0)  # keep controls stuck to top right
 
     def waitForHookLoaded(self, wingman=None):
         """Block until the hook has been loaded."""
         if wingman is None:
             try:
-                self.page().runJavaScript('try {wingman} catch(error) {null}', self.waitForHookLoaded)
+                self.mainPage.runJavaScript('try {wingman} catch(error) {null}', self.waitForHookLoaded)
             except RuntimeError:  # thrown if process is killed
                 return
         else:
-            self.initialiseNavmap()
+            self.onHookLoaded()
 
     def goForward(self):
+        """Go forwards in history."""
         self.backStack.append(self.getDisplayed())
-        self.displayMap(self.forwardsStack.pop())
+        self.displayName(self.forwardsStack.pop())
 
     def goBack(self):
+        """Go backwards in history."""
         self.forwardsStack.append(self.getDisplayed())
         self.backStack.pop()
-        self.displayMap(self.backStack.pop())
+        self.displayName(self.backStack.pop())
+
+    def getBackgroundColour(self) -> QtGui.QColor:
+        """Get the background colour of this widget's parent, or failing that, a generic QWidget.
+
+        This is only an approximation as the "backgroundRole" colour of a widget may not be its actual, displayed
+        colour (see <https://stackoverflow.com/a/23020483>)."""
+        backgroundWidget = self.parentWidget() if self.parentWidget() else QtWidgets.QWidget()
+        return backgroundWidget.palette().color(backgroundWidget.backgroundRole())
+
+    @classmethod
+    def createPage(cls, navmapUrl: str) -> QtWebEngineWidgets.QWebEnginePage:
+        """Create the main page for the application, displaying a suitably modified Online Navmap."""
+        page = QtWebEngineWidgets.QWebEnginePage()
+        page.profile().setCachePath(NAVMAP_DIR)  # link cache directory
+        page.setUrl(QtCore.QUrl(navmapUrl))
+
+        hookSource = cls.getHookSource()
+        # create and inject script
+        script = QtWebEngineWidgets.QWebEngineScript()
+        script.setSourceCode(hookSource)
+        script.setName('navmap.js')
+        script.setWorldId(QtWebEngineWidgets.QWebEngineScript.MainWorld)
+        script.setInjectionPoint(QtWebEngineWidgets.QWebEngineScript.DocumentReady)
+        page.scripts().insert(script)
+
+        return page
+
+    @staticmethod
+    def getHookSource() -> str:
+        """Load custom JavaScript from resources, or from a file if it exists (useful for debugging)."""
+        if os.path.isfile(DEV_JS_PATH):
+            return open(DEV_JS_PATH).read()
+
+        file = QtCore.QFile(':/javascript/navmap.js')
+        if file.open(QtCore.QIODevice.ReadOnly | QtCore.QFile.Text):
+            return QtCore.QTextStream(file).readAll()
+        raise FileNotFoundError("MapView: couldn't load hook source")
