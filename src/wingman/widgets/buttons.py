@@ -35,7 +35,7 @@ class SquareButton(QtWidgets.QToolButton):
 
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum))
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self.setStyleSheet('QToolButton::menu-indicator { width: 0 }')  # hide dropdown arrow indicator
+        self.setStyleSheet('QToolButton::menu-indicator { width: 0; image: none }')  # hide dropdown arrow indicator
         if edge:
             self.setMinimumSize(edge, edge)
 
