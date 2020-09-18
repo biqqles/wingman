@@ -1,6 +1,6 @@
 [align=justify][color=#c9ced1][font=Open Sans][b][hrc]#1D3C5C[/hrc][/b][color=#66CCFF][float=right][img=90x90]https://i.imgur.com/Wlowwfn.png[/img][/float]
-[font=Oswald][size=xx-large][b]Wingman v0.1[/b] (Public Beta)[/size][/font][/color]
-[color=#ffffff][i][size=large]A companion for Discovery Freelancer.[/size][/i][/color]
+[font=Oswald][size=xx-large][b]Wingman v0.1.2[/b] (Public Beta)[/size][/font][/color]
+[color=#ffffff][i][size=large]A companion for Discovery Freelancer[/size][/i][/color]
 
 [b][color=#c0c0c0]Jump to: [a=download]Downloads[/a] | [a=gallery]Screenshots[/a] | [url=https://github.com/biqqles/wingman/]Code[/url][/color][/b][hrc]#1D3C5C[/hrc]
 
@@ -10,7 +10,7 @@
 
 [b]Wingman features:[/b]
 [list]
-[*] [i]Navmap:[/i] a beautiful navigation aid integrating and extending @"Error"'s [url=https://github.com/AudunVN/Navmap]Online Navmap[/url]
+[*] [i]Navmap:[/i] a beautiful navigation aid integrating and extending @"Error"'s [url=https://discoverygc.com/forums/showthread.php?tid=132266]Online Navmap[/url]
 [*] [i]Merchant:[/i] a powerful trading assistant
 [*] [i]Roster:[/i] a record of your in-game characters and their attributes
 [*] [i]Database:[/i] an information-dense overview of the game's world
@@ -19,7 +19,7 @@
 [*] Full cross-platform support, with downloads for Windows and Linux
 [/list]
 
-See [url=https://github.com/biqqles/wingman#launchpad]here[/url] for a list of features I am currently planning on adding in future. Please feel free to make your own suggestions! Wingman is intended to be community-led.
+See [url=https://github.com/biqqles/wingman#suggestions]here[/url] for a list of features I am currently planning on adding in future. Please feel free to make your own suggestions! Wingman is intended to be community-led.
 
 Wingman is free software, released under the GNU General Public License, version 3.0.
 
@@ -32,12 +32,9 @@ The application is built as a self-contained executable on Windows:
 
 
 [list]
-[*] [b]Download and run the installer:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1/wingman-0.1-setup.exe][font=monospace]wingman-0.1-setup.exe[/font] (50.3 MB)[/url]
-[*] [b]Or download a portable distribution:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1/wingman-0.1-portable.zip][font=monospace]wingman-0.1-portable.zip[/font] (68.5 MB)[/url]
+[*] [b]Download and run the installer:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1.2/wingman-0.1.2-setup.exe][font=monospace]wingman-0.1.2-setup.exe[/font] (50.3 MB)[/url]
+[*] [b]Or download a portable distribution:[/b] [url=https://github.com/biqqles/wingman/releases/download/v0.1.2/wingman-0.1.2-portable.zip][font=monospace]wingman-0.1.2-portable.zip[/font] (66.7 MB)[/url]
 [/list]
-
-[u]On Windows, administrative privileges are required[/u] to read the process memory of, and inject keyboard input into, Freelancer, so the application will ask for them before launching. I hope to improve this experience in future by restarting when features requiring these permissions are turned on.
-
 
 [*] [size=medium][color=#FFB600]Linux[/color][/size]
 Python 3.7 or higher is must be installed. Assuming your Python 3.7+ executable is available as [font=monospace][color=#91ad9f]python3[/color][/font],
@@ -46,11 +43,12 @@ Python 3.7 or higher is must be installed. Assuming your Python 3.7+ executable 
 [list]
 [*] [b]Install using:[/b] [font=monospace][color=#91ad9f]python3 -m pip install wingman[/color][/font]
 [*] [b]Uninstall using:[/b] [font=monospace][color=#91ad9f]python3 -m pip uninstall wingman[/color][/font]
+[*] [b]Upgrade using:[/b] [font=monospace][color=#91ad9f]python3 -m pip install wingman -U[/color][/font]
 [/list]
 
 [/list]
 
-[/pi][pi amount=3]Additional details and more installation options are available on [url=https://github.com/biqqles/wingman#installation]GitHub[/url]. Build instructions are also included in that document. Old versions, and repository snapshots, can be found at [url=https://github.com/biqqles/wingman/releases/]Releases[/url].
+[/pi][pi amount=3]Additional details and more installation options are available on [url=https://github.com/biqqles/wingman#installation]GitHub[/url]. Build instructions are also included in that document. Older versions and detailed changelogs can be found [url=https://github.com/biqqles/wingman/releases/]here[/url].
 
 
 [/pi][anchor=gallery][sp2][a=gallery][img=12x12]https://i.imgur.com/fjTg0Y7.png[/img][/a][/sp2] [size=15][color=#66CCFF]Gallery[/color][/size][pi amount=3]
@@ -62,20 +60,20 @@ Python 3.7 or higher is must be installed. Assuming your Python 3.7+ executable 
 [size=8]
 Navmap[/size][/td]
 [td][url=https://i.imgur.com/OT9tPBr.png][img=480x295]https://i.imgur.com/OT9tPBr.png[/img][/url]
-[size=8]Running in KDE Plasma 5.10 (for details of my setup see [url=https://discoverygc.com/forums/showthread.php?tid=3019&pid=1934163#pid1934163]here[/url])[/size][/td]
+[size=8]Running in KDE Plasma 5[/size][/td]
 [/tr]
 [tr]
 [td][url=https://i.imgur.com/ErErW6B.png][img=480x295]https://i.imgur.com/ErErW6B.png[/img][/url]
 [size=8]
 Navmap context menu[/size][/td]
-[td][url=https://i.imgur.com/ErErW6B.png][img=480x295]https://i.imgur.com/ErErW6B.png[/img][/url]
-[size=8]Universe map [TODO][/size][/td]
+[td][url=https://i.imgur.com/UG0HXW2.png][img=287x295]https://i.imgur.com/UG0HXW2.png[/img][/url]
+[size=8]Universe map (Plasma)[/size][/td]
 [/tr]
 [tr]
 [td][url=https://i.imgur.com/T8fMRVb.png][img=480x295]https://i.imgur.com/T8fMRVb.png[/img][/url]
 [size=8]
 Merchant[/size][/td]
-[td][url=https://i.imgur.com/T8fMRVb.png][img=480x295]https://i.imgur.com/T8fMRVb.png[/img][/url]
+[td][url=https://i.imgur.com/g95DncH.png][img=480x295]https://i.imgur.com/g95DncH.png[/img][/url]
 [size=8]
 Roster[/size][/td]
 [/tr]
