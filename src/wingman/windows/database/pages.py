@@ -210,7 +210,7 @@ class EquipmentPage(DatabasePage):
 class GunsPage(EquipmentPage):
     """Database page displaying countermeasure droppers.
     Todo: needs stats from fl.entities.Munition."""
-    mainTableHeadings = ['Name', 'Price', 'Power usage', 'Refire delay', 'Muzzle velocity', 'Nickname',
+    mainTableHeadings = ['Name', 'Price', 'Power usage', 'Refire', 'Muzzle velocity', 'Nickname',
                          'Name ID', 'Info ID']
     equipmentType = fl.entities.Gun
 
@@ -220,7 +220,7 @@ class GunsPage(EquipmentPage):
                 EntityItem(gun),
                 CreditsItem(gun.price()),
                 NumberItem(gun.power_usage),
-                NumberItem(gun.refire_delay),
+                NumberItem(1 / gun.refire_delay),
                 NumberItem(gun.muzzle_velocity),
                 MonospaceItem(gun.nickname),
                 GenericItem(gun.ids_name),
