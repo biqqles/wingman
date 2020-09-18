@@ -9,8 +9,8 @@ from setuptools import setup, find_namespace_packages
 
 
 setup(
-    name='wingman',  # distribution name
-    version='0.1.2',
+    name='wingman',
+    version='0.1.3',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
@@ -26,7 +26,7 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Development Status :: 3 - Beta',
+        'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'Topic :: Games/Entertainment',
         'Intended Audience :: End Users/Desktop',
