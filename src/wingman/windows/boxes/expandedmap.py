@@ -49,10 +49,10 @@ class ExpandedMap(MapView):
         super().displayEntity(entity)
         self.setWindowModality(QtCore.Qt.NonModal)
         try:
-            self.loadCompleted.disconnect()
+            self.displayChanged.disconnect()
         except TypeError:  # raised when no callbacks are connected
             pass
-        self.loadCompleted.connect(lambda: self.setWindowTitle(self.getDisplayed()))
+        self.displayChanged.connect(lambda: self.setWindowTitle(self.getDisplayed()))
         self.display()
 
     def displayUniverse(self):
@@ -63,10 +63,10 @@ class ExpandedMap(MapView):
         self.setWindowTitle('Sirius')
         self.show()
         try:
-            self.loadCompleted.disconnect()
+            self.displayChanged.disconnect()
         except TypeError:  # raised when no callbacks are connected
             pass
-        self.loadCompleted.connect(self.hide)
+        self.displayChanged.connect(self.hide)
 
     def moveToCentre(self):
         """Move the widget to the centre of the currently active display."""

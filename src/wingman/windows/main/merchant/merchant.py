@@ -70,7 +70,7 @@ class Merchant:
     def openUniverseMap(self, selector: QtWidgets.QComboBox):
         """Open the universe map, passing its choice to the given combo box."""
         self.expandedMap.displayUniverse()
-        self.expandedMap.loadCompleted.connect(lambda n: selector.setCurrentIndex(selector.findData(items.fl.systems[n])))
+        self.expandedMap.displayChanged.connect(lambda n: selector.setCurrentIndex(selector.findData(items.fl.systems[n])))
 
     def onDestinationToggled(self, toggled: bool):
         """Handle the specific destination check box being toggled."""

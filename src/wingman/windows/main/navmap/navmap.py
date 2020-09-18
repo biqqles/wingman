@@ -49,8 +49,8 @@ class Navmap:
         self.widget.searchEdit.setCompleter(completer)
 
         # connections
-        self.mapView.loadCompleted.connect(self.onURLChange)
-        self.mapView.loadCompleted.connect(print)
+        self.mapView.displayChanged.connect(self.onURLChange)
+        self.mapView.displayChanged.connect(print)
         self.widget.searchEdit.textEdited.connect(self.onSearchTextEdited)
         # textEdited is only emitted on user input, but completer counts as programmatic
         completer.activated.connect(self.onSearchTextEdited)
@@ -123,7 +123,7 @@ class Navmap:
     def displayUniverseMap(self):
         """Display an expanded universe map. Selecting a system will display it in the main navmap."""
         self.expandedMap.displayUniverse()
-        self.expandedMap.loadCompleted.connect(lambda n: self.mapView.displayEntity(fl.systems[n]))
+        self.expandedMap.displayChanged.connect(lambda n: self.mapView.displayEntity(fl.systems[n]))
         self.widget.gotoRadioButton.setChecked(True)
 
     def showFromExternal(self, entity: fl.entities.Entity):

@@ -32,8 +32,8 @@ DEV_JS_PATH = './widgets/mapview/navmap.js'
 class MapView(QtWebEngineWidgets.QWebEngineView):
     """A widget that attempts to display Space's Online Navmap <http://space.discoverygc.com/navmap/> in such a way
     that it is seamlessly integrated into the native application."""
-    navmapReady = QtCore.pyqtSignal(name='navmapReady')
-    loadCompleted = QtCore.pyqtSignal(str, name='loadCompleted')
+    navmapReady = QtCore.pyqtSignal()  # emitted once the navmap is fully initialised
+    displayChanged = QtCore.pyqtSignal(str)  # emitted when the displayed nickname changes
 
     def __init__(self, parent=None, url=config.navmap):
         """Initialise the widget."""
@@ -49,7 +49,7 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
         # load the real page
         self.mainPage = self.createPage(url)
-        self.waitForHookLoaded()
+        self.waitForHookLoaded()  # todo: try to do this asynchronously
 
         # create control panel
         self.controlsFrame = QtWidgets.QFrame(self)
