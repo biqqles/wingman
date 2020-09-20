@@ -208,10 +208,10 @@ class EquipmentPage(DatabasePage):
 
 
 class GunsPage(EquipmentPage):
-    """Database page displaying countermeasure droppers.
-    Todo: needs stats from fl.entities.Munition."""
-    mainTableHeadings = ['Name', 'Price', 'Power usage', 'Refire', 'Muzzle velocity', 'Nickname',
-                         'Name ID', 'Info ID']
+    """Database page displaying guns."""
+    mainTableHeadings = ['Name', 'Price', 'Hardpoint', 'Energy/shot', 'Refire', 'Speed', 'Range', 'Dispersion',
+                         'Hull dmg', 'Shield dmg', 'Hull dps', 'Shield dps', 'Energy/s', 'Efficiency',
+                         'Technology', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Gun
 
     def populate(self):
@@ -219,14 +219,25 @@ class GunsPage(EquipmentPage):
             [
                 EntityItem(gun),
                 CreditsItem(gun.price()),
+                MonospaceItem(gun.hp_gun_type),
                 NumberItem(gun.power_usage),
-                NumberItem(1 / gun.refire_delay),
+                NumberItem(gun.refire()),
                 NumberItem(gun.muzzle_velocity),
+                NumberItem(gun.range()),
+                # ugly temporary hack for dsy_hfbc_primary01 currently having duplicated dispersion entries
+                NumberItem(gun.dispersion_angle if type(gun.dispersion_angle) is not list else gun.dispersion_angle[0]),
+                NumberItem(gun.hull_damage()),
+                NumberItem(gun.shield_damage()),
+                NumberItem(gun.hull_dps()),
+                NumberItem(gun.shield_dps()),
+                NumberItem(gun.energy_per_second()),
+                NumberItem(gun.efficiency()),
+                MonospaceItem(gun.technology()),
                 MonospaceItem(gun.nickname),
                 GenericItem(gun.ids_name),
                 GenericItem(gun.ids_info)
             ]
-            for gun in fl.equipment.of_type(self.equipmentType) if gun.good()
+            for gun in fl.equipment.of_type(self.equipmentType) if gun.good() and gun.munition()
         ])
 
 
