@@ -44,6 +44,7 @@ class SimpleTable(QtWidgets.QTableView):
         self.verticalHeader().setDefaultSectionSize(26)  # set default row height
         self.horizontalHeader().setStretchLastSection(True)
         self.horizontalHeader().setHighlightSections(False)  # fix for ugly/nonstandard bold header on Windows
+        self.horizontalHeader().setSectionsMovable(True)
         self.setSelectionMode(QtWidgets.QTableView.SingleSelection)
 
         # connections
