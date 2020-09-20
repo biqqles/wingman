@@ -81,7 +81,7 @@ class Configuration(configparser.ConfigParser):
 class Icons:
     """Set the icons of the interface depending on whether the background colour is light (meaning that dark icons
     should be used) or dark (meaning that light icons should be used)"""
-    monochrome = ['universemap', 'jump', 'expand', 'open', 'cc']
+    monochrome = ['universe', 'jump', 'expand', 'open', 'cc', 'left', 'right', 'swap']
 
     def __init__(self):
         prefix = ':/dark/' if self.determineLuminance() else ':/light/'
