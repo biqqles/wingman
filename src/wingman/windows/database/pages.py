@@ -209,8 +209,8 @@ class EquipmentPage(DatabasePage):
 
 class GunsPage(EquipmentPage):
     """Database page displaying guns."""
-    mainTableHeadings = ['Name', 'Price', 'Hardpoint', 'Energy/shot', 'Refire', 'Speed', 'Range', 'Dispersion',
-                         'Hull dmg', 'Shield dmg', 'Hull dps', 'Shield dps', 'Energy/s', 'Efficiency',
+    mainTableHeadings = ['Name', 'Price', 'Hardpoint', 'Energy/shot', 'Refire', 'Speed (ms⁻¹)', 'Range (m)',
+                         'Dispersion (°)', 'Hull dmg', 'Shield dmg', 'Hull dps', 'Shield dps', 'Energy/s', 'Efficiency',
                          'Technology', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Gun
 
@@ -243,17 +243,17 @@ class GunsPage(EquipmentPage):
 
 class ThrustersPage(EquipmentPage):
     """Database page displaying thrusters."""
-    mainTableHeadings = ['Name', 'Hit points', 'Cargo space', 'Energy/s', 'Price', 'Nickname', 'Name ID', 'Info ID']
+    mainTableHeadings = ['Name', 'Price', 'Hit points', 'Cargo space', 'Fuel/s', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Thruster
 
     def populate(self):
         self.mainTable.populate([
             [
                 EntityItem(thruster),
+                CreditsItem(thruster.price()),
                 NumberItem(thruster.hit_pts),
                 NumberItem(thruster.volume),
                 NumberItem(thruster.power_usage),
-                CreditsItem(thruster.price()),
                 MonospaceItem(thruster.nickname),
                 GenericItem(thruster.ids_name),
                 GenericItem(thruster.ids_info),
@@ -281,7 +281,7 @@ class IDsPage(EquipmentPage):
 
 class ArmourPage(EquipmentPage):
     """Database page displaying armour upgrades."""
-    mainTableHeadings = ['Name', 'Price', 'Hit points multiplier', 'Nickname', 'Name ID', 'Info ID']
+    mainTableHeadings = ['Name', 'Price', 'Cargo space', 'Armour multiplier', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Armor
 
     def populate(self):
@@ -289,6 +289,7 @@ class ArmourPage(EquipmentPage):
             [
                 EntityItem(armour),
                 CreditsItem(armour.price()),
+                NumberItem(int(armour.volume)),
                 NumberItem(armour.hit_pts_scale),
                 MonospaceItem(armour.nickname),
                 GenericItem(armour.ids_name),
@@ -305,9 +306,32 @@ class CountermeasuresPage(EquipmentPage):
 
 
 class MinesPage(EquipmentPage):
-    """Database page displaying mine droppers.
-    Todo: needs stats from fl.entities.Mine."""
+    """Database page displaying mine droppers."""
+    mainTableHeadings = ['Name', 'Dropper price', 'Ammo price', 'Refire', 'Hull dmg', 'Shield dmg',
+                         'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (m/s⁻²)',
+                         'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.MineDropper
+
+    def populate(self):
+        """This base implementation populates the main table with fields common to all equipment types."""
+        self.mainTable.populate([
+            [
+                EntityItem(dropper),
+                CreditsItem(dropper.price()),
+                CreditsItem(dropper.mine().price()),
+                NumberItem(dropper.refire()),
+                NumberItem(dropper.hull_damage()),
+                NumberItem(dropper.shield_damage()),
+                NumberItem(dropper.mine().explosion().radius),
+                NumberItem(dropper.mine().seek_dist),
+                NumberItem(dropper.mine().top_speed),
+                NumberItem(dropper.mine().acceleration),
+                MonospaceItem(dropper.nickname),
+                GenericItem(dropper.ids_name),
+                GenericItem(dropper.ids_info)
+            ]
+            for dropper in fl.equipment.of_type(self.equipmentType)
+        ])
 
 
 class CloaksPage(EquipmentPage):
