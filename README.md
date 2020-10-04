@@ -28,7 +28,7 @@ Alternatively, if you have Python 3.7 or higher installed, you can use the insta
 ### Installing on Linux
 Assuming you have Python 3.7 or higher installed and available as `python3`, simply run `python3 -m pip install wingman`.
 
-After installation the application should be available either from your desktop's application menu or by running `wingman`. (You may need to log in and out to get the icon to show.)
+After installation the application should be available either from your desktop's application menu or, if you ran pip with sudo, by running `wingman` in a terminal. (You may need to log in and out to get the icon to show.)
 
 To uninstall, run `python3 -m pip uninstall wingman`.
 
@@ -48,7 +48,7 @@ Ensure PyQt5 is installed. The included `pyrcc5` utility is required for buildin
 For both platforms (Windows and Linux), the first step is always to compile a fresh copy of the Qt resource file containing the icons and text files the application needs, using `pyrcc5`. From the root directory, run `pyrcc5 src/resources.qrc -o src/wingman/resources.py`
 
 ### For Windows
-From the root directory, `cd packaging/windows`. Ensure that [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/) is installed, in addition to the application itself's requirements.
+From the root directory, `cd packaging/windows`. Ensure that [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/) is installed, in addition to the application's own requirements.
 
 Now run `build.bat` to build a one folder application and an installer.
 
