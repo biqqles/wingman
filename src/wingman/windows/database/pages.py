@@ -281,7 +281,7 @@ class IDsPage(EquipmentPage):
 
 class ArmourPage(EquipmentPage):
     """Database page displaying armour upgrades."""
-    mainTableHeadings = ['Name', 'Price', 'Cargo space', 'Armour multiplier', 'Nickname', 'Name ID', 'Info ID']
+    mainTableHeadings = ['Name', 'Price', 'Cargo space', 'Health multiplier', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Armor
 
     def populate(self):
@@ -300,16 +300,36 @@ class ArmourPage(EquipmentPage):
 
 
 class CountermeasuresPage(EquipmentPage):
-    """Database page displaying countermeasure droppers.
-    Todo: needs stats from fl.entities.CounterMeasure."""
+    """Database page displaying countermeasure droppers."""
+    mainTableHeadings = ['Name', 'Dropper price', 'Flare price', 'Max flares', 'Refire', 'Range (m)', 'Effectiveness',
+                         'Lifetime (s)', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.CounterMeasureDropper
+
+    def populate(self):
+        """This base implementation populates the main table with fields common to all equipment types."""
+        self.mainTable.populate([
+            [
+                EntityItem(dropper),
+                CreditsItem(dropper.price()),
+                CreditsItem(dropper.countermeasure().price()),
+                NumberItem(dropper.countermeasure().ammo_limit),
+                NumberItem(dropper.refire()),
+                NumberItem(dropper.countermeasure().range),
+                PercentageItem(dropper.countermeasure().effectiveness()),
+                NumberItem(dropper.countermeasure().lifetime),
+                MonospaceItem(dropper.nickname),
+                GenericItem(dropper.ids_name),
+                GenericItem(dropper.ids_info)
+            ]
+            for dropper in fl.equipment.of_type(self.equipmentType) if dropper.countermeasure()
+        ])
 
 
 class MinesPage(EquipmentPage):
     """Database page displaying mine droppers."""
-    mainTableHeadings = ['Name', 'Dropper price', 'Ammo price', 'Refire', 'Hull dmg', 'Shield dmg',
+    mainTableHeadings = ['Name', 'Dropper price', 'Ammo price', 'Max ammo', 'Refire', 'Hull dmg', 'Shield dmg',
                          'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (m/s⁻²)',
-                         'Nickname', 'Name ID', 'Info ID']
+                         'Lifetime', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.MineDropper
 
     def populate(self):
@@ -319,6 +339,7 @@ class MinesPage(EquipmentPage):
                 EntityItem(dropper),
                 CreditsItem(dropper.price()),
                 CreditsItem(dropper.mine().price()),
+                NumberItem(dropper.mine().ammo_limit),
                 NumberItem(dropper.refire()),
                 NumberItem(dropper.hull_damage()),
                 NumberItem(dropper.shield_damage()),
@@ -326,6 +347,7 @@ class MinesPage(EquipmentPage):
                 NumberItem(dropper.mine().seek_dist),
                 NumberItem(dropper.mine().top_speed),
                 NumberItem(dropper.mine().acceleration),
+                NumberItem(dropper.mine().lifetime),
                 MonospaceItem(dropper.nickname),
                 GenericItem(dropper.ids_name),
                 GenericItem(dropper.ids_info)
