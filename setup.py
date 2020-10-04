@@ -10,7 +10,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name='wingman',
-    version='0.1.3',
+    version='0.2',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
@@ -35,8 +35,8 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy',
-        'fl-flint>=0.3',
+        'dataclassy>=0.5',
+        'fl-flint>=0.7',
         'fl-flair; platform_system=="Windows"',
         'ago',
         'Pillow',
