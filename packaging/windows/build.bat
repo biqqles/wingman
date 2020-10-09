@@ -6,7 +6,7 @@ pyrcc5 "../../src/resources.qrc" -o "../../src/wingman/resources.py"
 :: build exe
 py -m PyInstaller windows.spec -y
 
-:: remove unecessary files
+:: remove unnecessary files
 chdir "./dist/Wingman/"
 rmdir /s /q "wingman/cache"
 rmdir /s /q "wingman/__pycache__"
@@ -23,4 +23,4 @@ explorer .
 
 :: generate installer
 chdir "./../../"
-"C:\Program Files (x86)\Inno Setup 5\ISCC.exe" installer.iss
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
