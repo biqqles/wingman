@@ -14,7 +14,7 @@ setup(
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
-    url='https://github.com/biqqles/wingman',
+    url='https://discoverygc.com/forums/showthread.php?tid=150721',
 
     description='A companion for Discovery Freelancer',
     long_description=open('README.md').read(),
