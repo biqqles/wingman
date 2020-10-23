@@ -81,7 +81,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar = QtWidgets.QMenuBar()
         self.setMenuBar(self.menubar)
 
-        self.menubar.addMenu(menus.Utilities(self.menubar))
+        self.menubar.addAction(menus.DatabaseAction(self.menubar))
         self.menubar.addMenu(menus.File(self.menubar))
         self.menubar.addMenu(menus.Freelancer(self.menubar))
         self.menubar.addMenu(menus.Preferences(self.menubar))

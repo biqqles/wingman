@@ -23,7 +23,7 @@ import os.path
 import subprocess
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QMenu, QAction, QMenuBar, QFileDialog
+from PyQt5.QtWidgets import QMenu, QAction, QMenuBar, QFileDialog, QToolTip
 import flint as fl
 
 from ..database import layout
@@ -91,12 +91,16 @@ def startLauncher():
     subprocess.call(fl.paths.construct_path('DSLauncher.exe'), cwd=config.install)
 
 
-class Utilities(SimpleMenu):
-    """'Utilities' menu."""
-    title = '&Utilities'
-    actions_ = [
-        SimpleAction('&Database', lambda: layout.Database().exec(), 'Ctrl+D'),
-    ]
+class DatabaseAction(SimpleAction):
+    def __init__(self, parent):
+        super().__init__('&Database', lambda: layout.Database().exec(), 'Ctrl+D')
+        self.setParent(parent)  # required to show up in QMenuBar
+        self.hovered.connect(self.showToolTip)
+
+    def showToolTip(self):
+        """QMenuBar does not show tooltips for top-level actions so mimic this manually."""
+        QToolTip.showText(QtGui.QCursor.pos(), 'An information-dense overview of the game world. (Ctrl+D)')
+        self.triggered.connect(lambda: self.setToolTip(''))  # force hide upon click
 
 
 class File(SimpleMenu):
