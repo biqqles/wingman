@@ -37,7 +37,6 @@ class SimpleTree(QtWidgets.QTreeView):
         # configure model
         self.itemModel = QtGui.QStandardItemModel()
         self.itemModel.setHorizontalHeaderLabels(header)
-        self.itemModel.setItemPrototype(items.GenericItem(''))
         self.itemModel.dataChanged.connect(self.resizeColumnsToContents)
         self.setModel(self.itemModel)
 

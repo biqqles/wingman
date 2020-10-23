@@ -32,7 +32,7 @@ class AccountsModel(QtGui.QStandardItemModel):
     """A hierarchical model for storing game accounts and their characters."""
     def __init__(self):
         super().__init__()
-        self.dataChanged.connect(self.onDataChanged)
+        self.setItemPrototype(items.BlankItem())
 
     def addAccount(self, code, name, description):
         """Add an account to the model, returning its new row."""
@@ -147,15 +147,22 @@ class AccountsModel(QtGui.QStandardItemModel):
                 self.addCharacter(accountItem, name=charAttributes.pop('name', charName), **charAttributes)
             self.updateAccountSummary(accountItem)
 
-    def onDataChanged(self, topLeft: QtCore.QModelIndex, bottomRight: QtCore.QModelIndex):
-        """Handle the model's data being changed."""
-        item = self.itemFromIndex(topLeft)
-        parent = item.parent()
+    def insertRows(self, row: int, count: int, parent: QtCore.QModelIndex = QtCore.QModelIndex()):
+        """Hook row insertion to keep account summaries and serialisation in sync with character insertions and
+        moves."""
+        result = super().insertRows(row, count, parent)
+        if parent.isValid():
+            self.updateAccountSummary(self.itemFromIndex(parent))
+            self.serialise()
+        return result
 
-        if parent is not None and parent is not self.invisibleRootItem():
-            self.updateAccountSummary(parent)
-
-        self.serialise()
+    def removeRows(self, row: int, count: int, parent: QtCore.QModelIndex = QtCore.QModelIndex()):
+        """Hook row removal to keep account summaries and serialisation in sync with character insertions and moves."""
+        result = super().removeRows(row, count, parent)
+        if parent.isValid():
+            self.updateAccountSummary(self.itemFromIndex(parent))
+            self.serialise()
+        return result
 
     def findAccount(self, accountCode: int) -> Optional[items.AccountItem]:
         """Find an account's item in the model from its code (aka hash)."""
