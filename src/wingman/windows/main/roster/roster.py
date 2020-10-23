@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List
+import logging
 import os.path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -40,7 +41,7 @@ class Roster:
 
         # configure model and view
         self.sortModel = TextFilter(AccountsModel())
-        self.model = self.sortModel.sourceModel()
+        self.model: AccountsModel = self.sortModel.sourceModel()
         self.model.setHorizontalHeaderLabels(self.tree.horizontalHeaderLabels())
         self.tree.setModel(self.sortModel)
 
@@ -123,8 +124,16 @@ class Roster:
     def onCharacterUpdate(self, **kwargs):
         """Handle a character record update from flair."""
         assert IS_WIN
-        kwargs.update(name=flair.state.name)
-        self.model.updateCharacter(account=flair.state.account, **kwargs)
+        name = kwargs.setdefault('name', flair.state.name)
+        account = kwargs.setdefault('account', flair.state.account)
+        updateTime = QtCore.QDateTime.currentDateTime()
+
+        if self.model.findCharacter(name):
+            self.model.updateCharacter(logged=updateTime, **kwargs)
+        else:
+            self.model.addCharacter(self.model.findAccount(account), name, flair.state.credits or 0,
+                                    flair.state.system or '', flair.state.base or '', updateTime, '')
+
         self.model.serialise()
 
     def export(self):

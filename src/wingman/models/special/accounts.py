@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import Dict, Iterator, Tuple
+from typing import Dict, Iterator, Tuple, Optional
 from collections import defaultdict
 import json
 import os.path
@@ -67,6 +67,29 @@ class AccountsModel(QtGui.QStandardItemModel):
 
         self.itemFromIndex(accountItem.index().siblingAtColumn(3)).putData(sum(balances))
         self.itemFromIndex(accountItem.index().siblingAtColumn(4)).putData(max(dates, default=None))
+
+    def updateCharacter(self, name, account, logged, balance=None, system=None, base=None):
+        """Update a character's record in the model."""
+        if name is None or name == 'Trent':  # (hacky) ignore single player
+            return
+
+        accountItem = self.model.findAccount(account)
+        if not accountItem:
+            raise ValueError(f'Account {account!r} for character {name!r} not found')
+
+        characterItem = self.model.findCharacter(name)
+        if not characterItem:
+            raise ValueError(f'Character {name!r} not found')
+
+        index = characterItem.index()
+        if base is not None:
+            self.model.itemFromIndex(index.siblingAtColumn(1)).putData(base)
+        elif system is not None:
+            self.model.itemFromIndex(index.siblingAtColumn(2)).putData(system)
+        elif balance is not None:
+            self.model.itemFromIndex(index.siblingAtColumn(3)).putData(balance)
+        elif logged is not None:
+            self.model.itemFromIndex(index.siblingAtColumn(4)).putData(logged)
 
     def serialise(self, toFile=ROSTER_FILE):
         """Serialise the model to a JSON file."""
@@ -130,6 +153,19 @@ class AccountsModel(QtGui.QStandardItemModel):
             self.updateAccountSummary(parent)
 
         self.serialise()
+
+    def findAccount(self, accountCode: int) -> Optional[items.AccountItem]:
+        """Find an account's item in the model from its code (aka hash)."""
+        for item in self.allItems():
+            if isinstance(item, items.AccountItem) and item.getData().hash == accountCode:
+                return item
+
+    def findCharacter(self, characterName: str) -> Optional[items.GenericItem]:
+        """Find a character's item in the model from its name."""
+        try:
+            return self.findItems(characterName, QtCore.Qt.MatchRecursive)[0]
+        except IndexError:
+            return None
 
     def allItems(self) -> Iterator[QtGui.QStandardItem]:
         """Return an iterator over all the model's items in order of addition, starting from the root item."""
