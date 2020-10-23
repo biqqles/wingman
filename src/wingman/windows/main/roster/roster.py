@@ -78,6 +78,11 @@ class Roster:
             item.setEditable(False)
             item.setDragEnabled(False)
 
+        try:
+            self.model.itemChanged.disconnect()
+        except TypeError:  # when no connections have been made
+            pass
+
     def onFilterTextEdited(self, text):
         """Handle the filter text being changed."""
         if not text:
@@ -99,6 +104,12 @@ class Roster:
         row = row or self.tree.getSelectedRow()
         for item in row:
             item.setEditable(True)
+
+        @self.model.itemChanged.connect
+        def editCallback():
+            """Avoid recursively calling updateAccountSummary on the account once it is edited."""
+            if not isinstance(item, items.AccountItem):
+                self.model.updateAccountSummary(item.parent())
 
     def makeCharacterMovable(self, row=None):
         """Make the character at row movable between accounts. If row is not provided, it defaults to the selected
