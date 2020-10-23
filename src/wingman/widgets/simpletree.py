@@ -54,19 +54,6 @@ class SimpleTree(QtWidgets.QTreeView):
         self.setUniformRowHeights(True)
         self.setAnimated(True)
 
-    def allItems(self) -> Iterator[QtGui.QStandardItem]:
-        root = self.itemModel.invisibleRootItem()
-
-        def recurse(parent):
-            for row in range(parent.rowCount()):
-                for column in range(parent.columnCount()):
-                    child = parent.child(row, column)
-                    yield child
-                    if child is not None and child.hasChildren():
-                        yield from recurse(child)
-
-        yield from recurse(root)
-
     def getSelectedRow(self) -> List[QtGui.QStandardItem]:
         return [i.model().sourceModel().itemFromIndex(i.model().mapToSource(i)) for i in self.selectedIndexes()]
 
@@ -74,3 +61,6 @@ class SimpleTree(QtWidgets.QTreeView):
         if not selected.indexes():
             return
         self.rowSelected.emit(self.getSelectedRow())
+
+    def horizontalHeaderLabels(self) -> List[str]:
+        return [self.itemModel.headerData(i, QtCore.Qt.Horizontal) for i in range(self.itemModel.columnCount())]
