@@ -95,7 +95,7 @@ class SimpleTable(QtWidgets.QTableView):
         copy.setIcon(QtGui.QIcon.fromTheme('edit-copy'))
         copy.addAction('cell').triggered.connect(lambda: self.copyToClipboard(value=cell.data()))
         copy.addAction('row').triggered.connect(lambda: self.copyToClipboard(row=cell.row()))
-        copy.addAction('table').triggered.connect(self.copyToClipboard)
+        copy.addAction('table').triggered.connect(lambda: self.copyToClipboard())
 
         menu.exec(QtGui.QCursor.pos())
 
