@@ -117,7 +117,7 @@ class Roster:
         """Create a new character and add it to the tree. Unlike addCharacter, this is intended to be triggered by the
         user."""
         newRow = self.model.addCharacter(parentAccount, name='', credits=0, system='', base='',
-                                         logged=QtCore.QDateTime.currentDateTime().toSecsSinceEpoch(), description='')
+                                         logged=QtCore.QDateTime.currentDateTime(), description='')
         self.makeCharacterEditable(newRow)
         self.tree.expandAll()
 
@@ -127,6 +127,9 @@ class Roster:
         name = kwargs.setdefault('name', flair.state.name)
         account = kwargs.setdefault('account', flair.state.account)
         updateTime = QtCore.QDateTime.currentDateTime()
+
+        if not name:  # if name has not been set in memory yet, we don't have a key to go on
+            return
 
         if self.model.findCharacter(name):
             self.model.updateCharacter(logged=updateTime, **kwargs)
