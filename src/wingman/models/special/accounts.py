@@ -22,7 +22,7 @@ import json
 import os.path
 import xml.etree.ElementTree as xml
 
-from PyQt5 import QtGui
+from PyQt5 import QtCore, QtGui
 
 from ... import config, ROSTER_FILE
 from .. import items
@@ -30,6 +30,10 @@ from .. import items
 
 class AccountsModel(QtGui.QStandardItemModel):
     """A hierarchical model for storing game accounts and their characters."""
+    def __init__(self):
+        super().__init__()
+        self.dataChanged.connect(self.onDataChanged)
+
     def addAccount(self, code, name, description):
         """Add an account to the model, returning its new row."""
         accountItem = items.AccountItem(items.AccountItem.Account(code, name, description))
@@ -76,7 +80,7 @@ class AccountsModel(QtGui.QStandardItemModel):
             if isinstance(item, items.AccountItem):
                 account = result[serialised] = dict(characters=defaultdict(dict))
             elif isinstance(item.parent(), items.AccountItem):
-                column = self.tree.itemModel.horizontalHeaderItem(item.column()).text()
+                column = self.horizontalHeaderItem(item.column()).text()
 
                 if column == 'Name':
                     character = account['characters'][serialised]
@@ -116,6 +120,16 @@ class AccountsModel(QtGui.QStandardItemModel):
             for charName, charAttributes in db[code]['characters'].items():
                 self.addCharacter(accountItem, name=charAttributes.pop('name', charName), **charAttributes)
             self.updateAccountSummary(accountItem)
+
+    def onDataChanged(self, topLeft: QtCore.QModelIndex, bottomRight: QtCore.QModelIndex):
+        """Handle the model's data being changed."""
+        item = self.itemFromIndex(topLeft)
+        parent = item.parent()
+
+        if parent is not None and parent is not self.invisibleRootItem():
+            self.updateAccountSummary(parent)
+
+        self.serialise()
 
     def allItems(self) -> Iterator[QtGui.QStandardItem]:
         """Return an iterator over all the model's items in order of addition, starting from the root item."""

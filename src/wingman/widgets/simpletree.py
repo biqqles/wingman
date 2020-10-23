@@ -38,6 +38,7 @@ class SimpleTree(QtWidgets.QTreeView):
         self.itemModel = QtGui.QStandardItemModel()
         self.itemModel.setHorizontalHeaderLabels(header)
         self.itemModel.setItemPrototype(items.GenericItem(''))
+        self.itemModel.dataChanged.connect(self.resizeColumnsToContents)
         self.setModel(self.itemModel)
 
         # configure view
@@ -55,12 +56,20 @@ class SimpleTree(QtWidgets.QTreeView):
         self.setAnimated(True)
 
     def getSelectedRow(self) -> List[QtGui.QStandardItem]:
+        """Return a list of the items in the currently selected row."""
         return [i.model().sourceModel().itemFromIndex(i.model().mapToSource(i)) for i in self.selectedIndexes()]
 
     def selectionChanged(self, selected: QtCore.QItemSelection, deselected: QtCore.QItemSelection):
+        """Emit a signal when the selected row is changed."""
         if not selected.indexes():
             return
         self.rowSelected.emit(self.getSelectedRow())
 
     def horizontalHeaderLabels(self) -> List[str]:
+        """Return the model's horizontal header labels (see setHorizontalHeaderLabels)"""
         return [self.itemModel.headerData(i, QtCore.Qt.Horizontal) for i in range(self.itemModel.columnCount())]
+
+    def resizeColumnsToContents(self):
+        """Resize all columns to their contents."""
+        for column in range(self.itemModel.columnCount()):
+            self.resizeColumnToContents(column)

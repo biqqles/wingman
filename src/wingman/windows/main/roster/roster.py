@@ -41,7 +41,6 @@ class Roster:
         # configure model and view
         self.sortModel = TextFilter(AccountsModel())
         self.model = self.sortModel.sourceModel()
-        self.model.dataChanged.connect(self.onDataChanged)
         self.model.setHorizontalHeaderLabels(self.tree.horizontalHeaderLabels())
         self.tree.setModel(self.sortModel)
 
@@ -74,7 +73,7 @@ class Roster:
         self.widget.editCharButton.setEnabled(not isAccountRow)
         self.tree.setDragEnabled(not isAccountRow)
 
-        for item in self.tree.allItems():
+        for item in self.model.allItems():
             item.setEditable(False)
             item.setDragEnabled(False)
 
@@ -127,19 +126,6 @@ class Roster:
         kwargs.update(name=flair.state.name)
         self.model.updateCharacter(account=flair.state.account, **kwargs)
         self.model.serialise()
-
-    def onDataChanged(self, topLeft: QtCore.QModelIndex, bottomRight: QtCore.QModelIndex):
-        """Handle a data edit"""
-        item = self.model.itemFromIndex(topLeft)
-        parent = item.parent()
-
-        if parent is not None and parent is not self.model.invisibleRootItem():
-            self.model.updateAccountSummary(parent)
-
-        self.model.serialise()
-
-        for column in range(self.model.columnCount()):
-            self.tree.resizeColumnToContents(column)
 
     def export(self):
         """Allow the model to be exported to a file of the user's choice."""
