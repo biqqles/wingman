@@ -42,13 +42,14 @@ class AccountsModel(QtGui.QStandardItemModel):
         self.invisibleRootItem().appendRow(newRow)
         return newRow
 
-    @staticmethod
-    def addCharacter(parentAccount: items.AccountItem, name, credits, system, base, logged, description):
+    def addCharacter(self, parentAccount: items.AccountItem, name, credits, system, base, logged, description):
         """Add a character to the model, returning the new row."""
         dateItem = items.DateItem.deserialise(logged) if type(logged) is int else items.DateItem(logged)
         newRow = [items.GenericItem(name), items.GenericItem(base), items.GenericItem(system),
                   items.CreditsItem(credits), dateItem, items.GenericItem(description)]
         parentAccount.appendRow(newRow)
+
+        self.updateAccountSummary(parentAccount)
         return newRow
 
     def updateAccountSummary(self, accountItem: items.AccountItem):
@@ -73,23 +74,25 @@ class AccountsModel(QtGui.QStandardItemModel):
         if name is None or name == 'Trent':  # (hacky) ignore single player
             return
 
-        accountItem = self.model.findAccount(account)
+        accountItem = self.findAccount(account)
         if not accountItem:
             raise ValueError(f'Account {account!r} for character {name!r} not found')
 
-        characterItem = self.model.findCharacter(name)
+        characterItem = self.findCharacter(name)
         if not characterItem:
             raise ValueError(f'Character {name!r} not found')
 
         index = characterItem.index()
         if base is not None:
-            self.model.itemFromIndex(index.siblingAtColumn(1)).putData(base)
+            self.itemFromIndex(index.siblingAtColumn(1)).putData(base)
         elif system is not None:
-            self.model.itemFromIndex(index.siblingAtColumn(2)).putData(system)
+            self.itemFromIndex(index.siblingAtColumn(2)).putData(system)
         elif balance is not None:
-            self.model.itemFromIndex(index.siblingAtColumn(3)).putData(balance)
+            self.itemFromIndex(index.siblingAtColumn(3)).putData(balance)
         elif logged is not None:
-            self.model.itemFromIndex(index.siblingAtColumn(4)).putData(logged)
+            self.itemFromIndex(index.siblingAtColumn(4)).putData(logged)
+
+        self.updateAccountSummary(accountItem)
 
     def serialise(self, toFile=ROSTER_FILE):
         """Serialise the model to a JSON file."""
