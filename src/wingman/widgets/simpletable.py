@@ -28,6 +28,12 @@ class SimpleTable(QtWidgets.QTableView):
     rowSelected = QtCore.pyqtSignal('PyQt_PyObject')  # emits a list of the cells in the selected row
     rowDeselected = QtCore.pyqtSignal('PyQt_PyObject')  # emits a list of the cells in the deselected row
 
+    class FixedHeightDelegate(QtWidgets.QStyledItemDelegate):
+        def sizeHint(self, option, index):
+            size = super().sizeHint(option, index)
+            size.setHeight(2)
+            return size
+
     def __init__(self, header: List[str]):
         super().__init__()
         # configure model
@@ -41,7 +47,7 @@ class SimpleTable(QtWidgets.QTableView):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.verticalHeader().hide()
         self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(26)  # set default row height
+        self.verticalHeader().setDefaultSectionSize(self.defaultRowHeight())
         self.horizontalHeader().setStretchLastSection(True)
         self.horizontalHeader().setHighlightSections(False)  # fix for ugly/nonstandard bold header on Windows
         self.horizontalHeader().setSectionsMovable(True)
@@ -126,3 +132,8 @@ class SimpleTable(QtWidgets.QTableView):
                     tmp.append(str(self.itemModel.index(row, column).data()))
                 result.append('\t'.join(tmp))
             return os.linesep.join(result)
+
+    @staticmethod
+    def defaultRowHeight() -> int:
+        """Calculate the default row height."""
+        return QtGui.QFontMetrics(QtGui.QStandardItem().font()).height() + 12
