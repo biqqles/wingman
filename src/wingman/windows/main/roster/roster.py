@@ -98,6 +98,7 @@ class Roster:
         self.tree.reset()
         self.tree.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.tree.expandAll()
+        self.tree.resizeColumnsToContents()
 
     def makeCharacterEditable(self, row=None):
         """Make the character at row editable. If row is not provided, it defaults to the selected row."""
