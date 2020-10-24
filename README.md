@@ -16,6 +16,9 @@ Under the hood, Wingman combines my two libraries for Freelancer - [flint](https
 
 Wingman is free software, released under the GNU General Public License, version 3.0.
 
+### Suggestions
+See [Issues](https://github.com/biqqles/wingman/issues?q=is%3Aissue+is%3Aopen+label%3A%22feature+request%22) for a list of new features that are currently planned. To be maximally useful Wingman should be community-led, so please feel free to make your own either in the project thread or here on GitHub.
+
 
 ## Installation
 ### Installing on Windows
@@ -56,40 +59,3 @@ Now run `build.bat` to build a one folder application and an installer.
 Again from the root directory, run `python setup.py sdist` to build a source distribution.
 
 To now install your locally-built distribution, run `pip install dist/wingman-*.tar.gz`.
-
-
-## Suggestions
-These are features I plan to implement in the future. To be maximally useful Wingman should be community-led so please feel free to make your own.
-
-### Navmap
-
-- Run the Online Navmap locally so the application does not require an internet connection
-- Provide detailed route planning and navigation
-
-### Merchant
-
-- Make contraband selector functional. Currently this doesn't matter as contraband scans are disabled on the server
-- Rigorously test results!
-
-### Roster
-
-- Record the ship types of characters
-- Handle character update commands (e.g. `/sendcash`, `/movechar`)
-- Allow character data to be imported as well as exported
-
-
-### Database
-
-- Toggleable "dev mode" filter which hides items not available to players to reduce clutter
-- Bribe information on Factions page
-- Rumours page
-- Split guns into missiles and possibly turrets
-- More statistics for guns, countermeasures, mines etc. (things with munitions/consumables)
-
-
-### Miscellaneous
-
-- (Windows) relaunch and ask for administrator permissions only when flair features are turned on
-- (Linux) install in virtualenv
-- Fix very strange selection visual behaviour on QTreeView
-- Automatically restart if path changed/preferences reset
