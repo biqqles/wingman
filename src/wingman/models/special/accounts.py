@@ -164,6 +164,12 @@ class AccountsModel(QtGui.QStandardItemModel):
             self.serialise()
         return result
 
+    def canDropMimeData(self, data, action, row, column, parent):
+        """Disallow drops to top level and onto anything other than AccountItem."""
+        if not parent.isValid() or column > 0:
+            return False
+        return super().canDropMimeData(data, action, row, column, parent)
+
     def findAccount(self, accountCode: int) -> Optional[items.AccountItem]:
         """Find an account's item in the model from its code (aka hash)."""
         for item in self.allItems():
