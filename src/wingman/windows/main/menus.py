@@ -100,7 +100,7 @@ class DatabaseAction(SimpleAction):
     def showToolTip(self):
         """QMenuBar does not show tooltips for top-level actions so mimic this manually."""
         QToolTip.showText(QtGui.QCursor.pos(), 'An information-dense overview of the game world. (Ctrl+D)')
-        self.triggered.connect(lambda: self.setToolTip(''))  # force hide upon click
+        self.triggered.connect(lambda: QToolTip.showText(''))  # force hide upon click
 
 
 class File(SimpleMenu):
