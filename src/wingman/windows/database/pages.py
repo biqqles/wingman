@@ -224,8 +224,7 @@ class GunsPage(EquipmentPage):
                 NumberItem(gun.refire()),
                 NumberItem(gun.muzzle_velocity),
                 NumberItem(gun.range()),
-                # ugly temporary hack for dsy_hfbc_primary01 currently having duplicated dispersion entries
-                NumberItem(gun.dispersion_angle if type(gun.dispersion_angle) is not list else gun.dispersion_angle[0]),
+                NumberItem(gun.dispersion_angle),
                 NumberItem(gun.hull_damage()),
                 NumberItem(gun.shield_damage()),
                 NumberItem(gun.hull_dps()),
