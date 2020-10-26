@@ -1,4 +1,5 @@
 # Wingman
+[Jump to source](src/wingman) | [Project thread](https://discoverygc.com/forums/showthread.php?tid=150721) | [Screenshots](https://discoverygc.com/forums/showthread.php?tid=150721#anchor-gallery)
 
 **Wingman** is a powerful desktop companion application specifically crafted for [Discovery Freelancer](https://discoverygc.com/). Intended to be a modern addition to the venerable [FLStat](http://adoxa.altervista.org/freelancer/tools.html#flstat) and [Freelancer Companion](http://wiz0u.free.fr/prog/flc/), it seeks to bring a wealth of new features to the community.
 
