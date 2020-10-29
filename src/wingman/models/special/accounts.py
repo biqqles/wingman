@@ -41,7 +41,7 @@ class AccountsModel(QtGui.QStandardItemModel):
             return False
         return super().canDropMimeData(data, action, row, column, parent)
 
-    def removeRows(self, row, count, parent = QtCore.QModelIndex()):
+    def removeRows(self, row, count, parent=QtCore.QModelIndex()):
         """Handle row removals and keep account summaries and serialisation up to date."""
         result = super().removeRows(row, count, parent)
         if parent.isValid():
@@ -74,6 +74,13 @@ class AccountsModel(QtGui.QStandardItemModel):
 
         self.updateAccountSummary(parentAccount)
         return newRow
+
+    def moveCharacter(self, character: items.GenericItem, fromAccount: items.AccountItem, toAccount: items.AccountItem):
+        """Move a character row between accounts."""
+        row = fromAccount.takeRow(character.row())
+        toAccount.appendRow(row)
+        self.updateAccountSummary(fromAccount)
+        self.updateAccountSummary(toAccount)
 
     def updateAccountSummary(self, accountItem: items.AccountItem):
         """Update an account row to summarise the attributes of the characters within."""
@@ -116,6 +123,10 @@ class AccountsModel(QtGui.QStandardItemModel):
         characterItem = self.findCharacter(name)
         if not characterItem:
             raise ValueError(f'Character {name!r} not found')
+
+        # if character is a child of the wrong account, move it
+        if characterItem.parent() is not accountItem:
+            self.moveCharacter(characterItem, fromAccount=characterItem.parent(), toAccount=accountItem)
 
         index = characterItem.index()
         if base is not None:
