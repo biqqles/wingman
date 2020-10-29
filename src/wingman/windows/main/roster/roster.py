@@ -157,6 +157,8 @@ class Roster:
                                     flair.state.system or '', flair.state.base or '', updateTime, '')
             logging.info(f'Adding new character')
 
+        self.tree.reset()
+        self.tree.expandAll()
         self.model.serialise()
 
     def export(self):
