@@ -33,6 +33,29 @@ class AccountsModel(QtGui.QStandardItemModel):
     def __init__(self):
         super().__init__()
         self.setItemPrototype(items.BlankItem())
+        self.dataChanged.connect(self.onDataChanged)
+
+    def canDropMimeData(self, data, action, row, column, parent):
+        """Disallow drops to top level and onto anything other than AccountItem."""
+        if not parent.isValid() or column > 0:
+            return False
+        return super().canDropMimeData(data, action, row, column, parent)
+
+    def removeRows(self, row, count, parent = QtCore.QModelIndex()):
+        """Handle row removals and keep account summaries and serialisation up to date."""
+        result = super().removeRows(row, count, parent)
+        if parent.isValid():
+            self.updateAccountSummary(self.itemFromIndex(parent))
+            self.serialise()
+        return result
+
+    def onDataChanged(self, topLeft: QtCore.QModelIndex, bottomRight: QtCore.QModelIndex):
+        """Handle row insertions. This method is actually called for every data change which is frustratingly
+        inefficient. However insertRows doesn't work for this purpose as, as far as I can tell, before it returns
+        rows are not actually added to the model making calling updateAccountSummary moot."""
+        parent = topLeft.parent()
+        if parent.isValid():
+            self.updateAccountSummary(self.itemFromIndex(parent))
 
     def addAccount(self, code, name, description):
         """Add an account to the model, returning its new row."""
@@ -58,16 +81,28 @@ class AccountsModel(QtGui.QStandardItemModel):
         dates = []
 
         for r in range(accountItem.rowCount()):
-            creditsItem, dateItem = accountItem.child(r, 3), accountItem.child(r, 4)
+            creditsItem, dateItem = accountItem.child(r, Column.BALANCE), accountItem.child(r, Column.LOGGED)
+            # The code here is convoluted because of the deeply unhelpful, and poorly documented, way Qt handles
+            # drag and drop operations. Firstly, when rows get moved between parents their items are deleted and
+            # recreated. Since you can only specify one generic type, any special behaviour of subtypes also gets
+            # nixed. Therefore we need to recreate items with the proper types.
+            # Also, when the row is first moved the items here are null, probably because the child rows haven't
+            # actually been inserted yet. However I am yet to find the place where I *can* access items as soon as
+            # they are added. Anyway, it doesn't matter too much because the illusion is only broken when you try
+            # to edit and notice that their custom DisplayRole behaviour has been deleted.
             if None not in (creditsItem, dateItem):
+                if not isinstance(creditsItem, items.CreditsItem):
+                    creditsItem = items.CreditsItem(creditsItem.getData())
+                    accountItem.setChild(r, Column.BALANCE, creditsItem)
+                    dateItem = items.DateItem(dateItem.getData())
+                    accountItem.setChild(r, Column.LOGGED, dateItem)
                 balances.append(creditsItem.getData())
                 dates.append(dateItem.getData())
-            # for some reason, when the row is moved these become null
-            # todo: when this happens a row can be duplicated in the model if it's not edited before exit
-            # todo: the old parent account also does not update
 
-        self.itemFromIndex(accountItem.index().siblingAtColumn(3)).putData(sum(balances))
-        self.itemFromIndex(accountItem.index().siblingAtColumn(4)).putData(max(dates, default=None))
+        summedBalances = sum(balances)
+        latestDate = max(dates, default=None)
+        self.itemFromIndex(accountItem.index().siblingAtColumn(Column.BALANCE)).putData(summedBalances)
+        self.itemFromIndex(accountItem.index().siblingAtColumn(Column.LOGGED)).putData(latestDate)
 
     def updateCharacter(self, name, account, logged, balance=None, system=None, base=None):
         """Update a character's record in the model."""
@@ -147,29 +182,6 @@ class AccountsModel(QtGui.QStandardItemModel):
                 self.addCharacter(accountItem, name=charAttributes.pop('name', charName), **charAttributes)
             self.updateAccountSummary(accountItem)
 
-    def insertRows(self, row: int, count: int, parent: QtCore.QModelIndex = QtCore.QModelIndex()):
-        """Hook row insertion to keep account summaries and serialisation in sync with character insertions and
-        moves."""
-        result = super().insertRows(row, count, parent)
-        if parent.isValid():
-            self.updateAccountSummary(self.itemFromIndex(parent))
-            self.serialise()
-        return result
-
-    def removeRows(self, row: int, count: int, parent: QtCore.QModelIndex = QtCore.QModelIndex()):
-        """Hook row removal to keep account summaries and serialisation in sync with character insertions and moves."""
-        result = super().removeRows(row, count, parent)
-        if parent.isValid():
-            self.updateAccountSummary(self.itemFromIndex(parent))
-            self.serialise()
-        return result
-
-    def canDropMimeData(self, data, action, row, column, parent):
-        """Disallow drops to top level and onto anything other than AccountItem."""
-        if not parent.isValid() or column > 0:
-            return False
-        return super().canDropMimeData(data, action, row, column, parent)
-
     def findAccount(self, accountCode: int) -> Optional[items.AccountItem]:
         """Find an account's item in the model from its code (aka hash)."""
         for item in self.allItems():
@@ -197,10 +209,20 @@ class AccountsModel(QtGui.QStandardItemModel):
 
     def empty(self):
         """Empty the model. This is distinct from reset() because it does not delete the header labels."""
-        self.removeRows(0, self.rowCount() - 1)  # empty model
+        self.removeRows(0, self.rowCount() - 1)
 
     @staticmethod
     def retrieveDSLauncherAccounts() -> Dict[str, Tuple[str, str]]:
         """Parse launcheraccounts.xml to a dictionary of tuples of the form {code: (name, description)}."""
         root = xml.parse(config.paths['accounts']).getroot()
         return {a.get('code'): (a.text, a.get('description')) for a in root.findall('account')}
+
+
+class Column:
+    """Enum for column roles."""
+    NAME = 0
+    BASE = 1
+    SYSTEM = 2
+    BALANCE = 3
+    LOGGED = 4
+    DESCRIPTION = 5
