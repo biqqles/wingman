@@ -34,6 +34,7 @@ class GenericItem(QtGui.QStandardItem):
         self.putData(initialData)
         self.setEditable(False)
         self.setDragEnabled(False)
+        self.setDropEnabled(False)
 
     def putData(self, data: T):
         """An abstraction over setData(). Sets data and updates the textual representation."""
