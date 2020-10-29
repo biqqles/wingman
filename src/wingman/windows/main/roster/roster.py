@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List
-import logging
 import os.path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -122,7 +121,10 @@ class Roster:
     def removeCharacter(self):
         """Remove a character's row from the tree."""
         row = self.tree.getSelectedRow()
-        row[0].parent().removeRow(row[0].row())
+        characterItem = row[0]
+        accountItem = characterItem.parent()
+        accountItem.removeRow(characterItem.row())
+        self.model.updateAccountSummary(accountItem)
         self.model.serialise()
 
     def createCharacter(self, parentAccount: items.AccountItem):
