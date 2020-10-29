@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List
+import logging
 import os.path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -33,7 +34,7 @@ if IS_WIN:
 
 class Roster:
     """The "Roster" tab provides a persistent list of accounts and their characters, along with their attributes.
-    This list updates upon receiving events from flair."""
+    While the game is running, this record is kept up to date with events from flair."""
     def __init__(self, widget: RosterTab):
         self.widget = widget
         self.tree = self.widget.tree
@@ -62,6 +63,7 @@ class Roster:
             flair.events.credits_changed.connect(self.onCharacterUpdate)
             flair.events.system_changed.connect(self.onCharacterUpdate)
             flair.events.docked.connect(self.onCharacterUpdate)
+        logging.info('Roster initialisation complete')
 
     def onSelectedRowChanged(self, selection: List[QtGui.QStandardItem]):
         """Enable or disable buttons based on the type of selection."""
@@ -142,14 +144,18 @@ class Roster:
         account = kwargs.setdefault('account', flair.state.account)
         updateTime = QtCore.QDateTime.currentDateTime()
 
+        logging.info(f'Character update ({name}/{account}) received: {kwargs}')
+
         if not name:  # if name has not been set in memory yet, we don't have a key to go on
             return
 
         if self.model.findCharacter(name):
             self.model.updateCharacter(logged=updateTime, **kwargs)
+            logging.info(f'Updating character')
         else:
             self.model.addCharacter(self.model.findAccount(account), name, flair.state.credits or 0,
                                     flair.state.system or '', flair.state.base or '', updateTime, '')
+            logging.info(f'Adding new character')
 
         self.model.serialise()
 
