@@ -22,8 +22,10 @@ application.
 import atexit
 import configparser
 import logging
+from io import BytesIO
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PIL import Image, ImageQt
 
 
 class Configuration(configparser.ConfigParser):
@@ -106,3 +108,10 @@ class Icons:
         colour = button.palette().color(button.backgroundRole())
         luminance = sum(colour.getRgb()) / 3
         return luminance > threshold
+
+    @staticmethod
+    def loadTGA(tga: bytes) -> QtGui.QPixmap:
+        """Load a TGA image as a QPixmap. For some reason, some images accepted by Freelancer do not load in PyQt - but
+        they do with the help of Pillow."""
+        image = ImageQt.ImageQt(Image.open(BytesIO(tga)))
+        return QtGui.QPixmap.fromImage(image)

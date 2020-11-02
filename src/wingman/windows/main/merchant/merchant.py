@@ -18,13 +18,11 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import Tuple, Optional
 from collections import defaultdict
-from io import BytesIO
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PIL import Image, ImageQt
 import flint as fl
 
-from .... import config
+from .... import config, icons
 from ...boxes import expandedmap
 from ....models import items, selectors
 from .layout import MerchantTab
@@ -105,16 +103,7 @@ class Merchant:
 
     def updateInfoPanel(self, data: items.ProfitItem.ProfitData):
         """Update the info side panel."""
-        # load and display commodity icon
-        icon = data.commodity.icon()
-        image = QtGui.QImage.fromData(icon, 'TGA')
-        # some icons fail to load into QImages with PyQt5 itself. I am yet to ascertain why. When this happens we
-        # can use Pillow to load the file instead since they work fine with it. 0x3039 seems to be the first pixel value
-        # on failure to load, don't know why.
-        if image.pixel(QtCore.QPoint(0, 0)) == 0x3039:
-            image = ImageQt.ImageQt(Image.open(BytesIO(icon)))
-        pixmap = QtGui.QPixmap.fromImage(image)
-        self.widget.infoIcon.setPixmap(pixmap)
+        self.widget.infoIcon.setPixmap(icons.loadTGA(data.commodity.icon()))  # update commodity icon
 
         # update labels
         self.widget.infoNameLabel.setText(f'<b>{data.commodity.name()}</b>')
