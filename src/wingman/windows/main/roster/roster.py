@@ -94,7 +94,11 @@ class Roster:
 
     def populateTree(self):
         """Populate the tree with deserialised data."""
-        self.model.deserialise()
+        try:
+            self.model.deserialise()
+        except FileNotFoundError:
+            self.showAccountsReadFailure()
+
         self.model.serialise()  # commit merged model to disk
         self.tree.reset()
         self.tree.sortByColumn(0, QtCore.Qt.AscendingOrder)
@@ -168,3 +172,11 @@ class Roster:
                                                        filter='JSON files (*.json)')[0]
         if toFile:
             self.model.serialise(toFile)
+
+    def showAccountsReadFailure(self):
+        """Alert the user of a failure to read launcheraccounts.xml."""
+        QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical,
+                              'Accounts read failure',
+                              "Could not load account data from 'launcheraccounts.xml'. "
+                              "Check that your 'My Games' path is configured correctly.",
+                              parent=self.widget).show()
