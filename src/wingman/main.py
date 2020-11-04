@@ -49,9 +49,9 @@ def main() -> int:
                                   "Check that Freelancer is not running as administrator and try again.").exec()
             return 1
 
-    loading.LoadingFiles().exec()
-
     mainWindow = MainWindow()
+
+    loading.LoadingFiles().exec()
 
     return app.exec()
 
