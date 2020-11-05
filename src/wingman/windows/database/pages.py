@@ -393,7 +393,7 @@ class ShieldsPage(EquipmentPage):
 class ShipsPage(EquipmentPage):
     """Database page displaying ships."""
     mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points', 'Hold size', 'Bots', 'Bats',
-                         'Max impulse (m/s)', 'Max reverse (m/s)', 'Cruise charge (s)',
+                         'Max impulse (ms⁻¹)', 'Max reverse (ms⁻¹)', 'Cruise charge (s)',
                          'Nickname', 'Name ID', 'Info ID']
 
     def populate(self):
