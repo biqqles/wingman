@@ -59,6 +59,13 @@ class ConfigurePaths(QtWidgets.QDialog):
         self.myGamesDirEdit.lineEdit.textChanged.connect(self.validate)
         self.formLayout.addRow("'My Games' directory", self.myGamesDirEdit)
 
+        if sys.platform.startswith('linux'):
+            defaultWinePrefixDir = config.paths['wine_prefix_dir'] or \
+                os.path.expanduser('~')
+            self.winePrefixDirEdit = PathEdit(defaultWinePrefixDir, lambda _: True)
+            self.winePrefixDirEdit.lineEdit.textChanged.connect(self.validate)
+            self.formLayout.addRow('Wine Prefix directory', self.winePrefixDirEdit)
+
         self.buttons = QtWidgets.QDialogButtonBox()
         self.buttons.addButton(QtWidgets.QDialogButtonBox.Save)
         self.buttons.addButton(QtWidgets.QDialogButtonBox.Cancel)
@@ -75,13 +82,16 @@ class ConfigurePaths(QtWidgets.QDialog):
 
     def allPathsValid(self):
         """Returns whether all paths entered are valid."""
-        return self.freelancerDirEdit.isValidPath() and self.myGamesDirEdit.isValidPath()
+        return self.freelancerDirEdit.isValidPath() and self.myGamesDirEdit.isValidPath() \
+            and self.winePrefixDirEdit.isValidPath() if sys.platform.startswith('linux') else True
 
     def writeConfig(self):
         """Commit the changes to the config file to disk. It should only be possible to call this after the paths
         have been confirmed as valid."""
         config.paths['freelancer_dir'] = self.freelancerDirEdit.lineEdit.text()
         config.paths['my_games'] = self.myGamesDirEdit.lineEdit.text()
+        if sys.platform.startswith('linux'):
+            config.paths['wine_prefix_dir'] = self.winePrefixDirEdit.lineEdit.text()
         config.commit()
         self.close()
 

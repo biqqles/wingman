@@ -19,11 +19,13 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file contains the application's entry point - main().
 """
 import os
+import sys
+import subprocess
+import time
 
 import flint as fl
 
 from wingman import app, config, IS_WIN  # non-relative imports for the benefit of PyInstaller
-from wingman.windows.main.layout import MainWindow
 from wingman.windows.boxes import configuration, loading
 
 
@@ -32,12 +34,32 @@ def main():
     if not fl.paths.is_probably_freelancer(config.paths['freelancer_dir']):
         configuration.ConfigurePaths(mandatory=True).exec()
     fl.paths.set_install_path(config.paths['freelancer_dir'])
-    if IS_WIN:
+    if sys.platform.startswith('win32'):
         import flair
         flair.set_install_path(config.paths['freelancer_dir'])
+    elif sys.platform.startswith('linux'):
+        if 'wine_prefix_dir' not in config.paths:
+            configuration.ConfigurePaths(mandatory=True).exec()
+        import rpyc
+        subprocess.Popen(
+            ['sudo', 'python3', '-m', 'flair', '-r', '-p', '18861', config.paths['freelancer_dir'], config.paths['wine_prefix_dir']],
+        )
+        c = None
+        while not c:
+            try:
+                c = rpyc.connect('localhost', 18861)
+            except ConnectionRefusedError:
+                print('Waiting for flair...')
+                time.sleep(1)
+
+        flair = c.root
+        print(config.paths['freelancer_dir'])
+        flair.set_install_path(config.paths['freelancer_dir'])
+        print(flair.get_state().running)
 
     loading.LoadingFiles().exec()
 
+    from wingman.windows.main.layout import MainWindow
     mainWindow = MainWindow()
 
     os._exit(app.exec())  # bad! but sys.exit isn't working for some reason (not to do with excepthook)

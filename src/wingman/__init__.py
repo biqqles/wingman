@@ -31,12 +31,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets  # WebEngine must
 from . import resources  # register resources
 from . import namespaces
 
-try:
-    # noinspection PyUnresolvedReferences
-    import flair
-    IS_WIN = True
-except ImportError:
-    IS_WIN = False
+IS_WIN = (sys.platform.startswith('win32'))
 
 # paths relative to app data directory
 NAVMAP_DIR = 'navmap'

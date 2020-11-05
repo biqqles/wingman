@@ -28,6 +28,10 @@ from .layout import NavmapTab
 
 if IS_WIN:
     import flair
+else:
+    import rpyc
+    c = rpyc.connect('localhost', 18861)
+    flair = c.root
 
 
 class Navmap:
@@ -64,14 +68,13 @@ class Navmap:
         self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentlyDisplayed.name()))
         self.onURLChange(self.currentlyDisplayed.nickname)
 
-        if IS_WIN:
-            self.widget.followRadioButton.setEnabled(flair.state.running)
-            flair.events.freelancer_started.connect(lambda: self.widget.followRadioButton.setEnabled(True))
-            flair.events.freelancer_started.connect(lambda: self.widget.followRadioButton.setChecked(True))
-            flair.events.freelancer_stopped.connect(lambda: self.widget.followRadioButton.setEnabled(False))
-            flair.events.freelancer_stopped.connect(lambda: self.widget.gotoRadioButton.setChecked(True))
-            flair.events.system_changed.connect(self.onFlairSystemChanged)
-            self.widget.followRadioButton.toggled.connect(self.onFollowModeEnabled)
+        self.widget.followRadioButton.setEnabled(flair.get_state().running)
+        flair.events.freelancer_started.connect(lambda: self.widget.followRadioButton.setEnabled(True))
+        flair.events.freelancer_started.connect(lambda: self.widget.followRadioButton.setChecked(True))
+        flair.events.freelancer_stopped.connect(lambda: self.widget.followRadioButton.setEnabled(False))
+        flair.events.freelancer_stopped.connect(lambda: self.widget.gotoRadioButton.setChecked(True))
+        flair.events.system_changed.connect(self.onFlairSystemChanged)
+        self.widget.followRadioButton.toggled.connect(self.onFollowModeEnabled)
 
     def onURLChange(self, nickname):
         self.currentlyDisplayed = self.searchableEntities.get(nickname)
@@ -91,8 +94,8 @@ class Navmap:
 
     def onFollowModeEnabled(self):
         """Handle follow mode being enabled."""
-        if flair.state.system is not None:
-            self.mapView.displayName(flair.state.system)
+        if flair.get_state().system is not None:
+            self.mapView.displayName(flair.get_state().system)
 
     def onFlairSystemChanged(self, system: str):
         """Handle a system_changed event from flair."""

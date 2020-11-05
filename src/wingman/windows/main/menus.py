@@ -33,6 +33,11 @@ from ... import config, IS_WIN
 if IS_WIN:
     import flair
     from flair.augment import cli, clipboard, screenshot
+else:
+    import rpyc
+    c = rpyc.connect('localhost', 18861)
+    flair = c.root
+    from flair.augment import cli, clipboard, screenshot
 
 
 class SimpleAction(QAction):
@@ -165,21 +170,17 @@ class Freelancer(SimpleMenu):
             self.Augmentations(menuBar)
         ]
         super().__init__(menuBar)
-        if IS_WIN:
-            self.actions_[0].setEnabled(flair.state.running)
-            flair.events.freelancer_started.connect(lambda: self.actions_[0].setEnabled(True))
-            flair.events.freelancer_stopped.connect(lambda: self.actions_[0].setEnabled(False))
-            self.actions_[0].triggered.connect(flair.hook.window.make_foreground)
+        self.actions_[0].setEnabled(flair.get_state().running)
+        flair.events.freelancer_started.connect(lambda: self.actions_[0].setEnabled(True))
+        flair.events.freelancer_stopped.connect(lambda: self.actions_[0].setEnabled(False))
+        self.actions_[0].triggered.connect(flair.hook.window.make_foreground)
 
-            if config['flair'].getboolean('clipboard'):
-                self.submenus[0].actions_[0].toggle()
-            if config['flair'].getboolean('screenshot'):
-                self.submenus[0].actions_[1].toggle()
-            if config['flair'].getboolean('cli'):
-                self.submenus[0].actions_[2].toggle()
-        else:
-            self.submenus[0].setEnabled(False)
-            self.actions_[0].setEnabled(False)
+        if config['flair'].getboolean('clipboard'):
+            self.submenus[0].actions_[0].toggle()
+        if config['flair'].getboolean('screenshot'):
+            self.submenus[0].actions_[1].toggle()
+        if config['flair'].getboolean('cli'):
+            self.submenus[0].actions_[2].toggle()
 
     @classmethod
     def toggleAugmentation(cls,  augmentation: Type['flair.augment.Augmentation'], toggled: bool):
@@ -188,7 +189,7 @@ class Freelancer(SimpleMenu):
 
     @classmethod
     def loadAugmentation(cls, augmentation: Type['flair.augment.Augmentation']):
-        instance = augmentation(flair.state)
+        instance = augmentation(flair.get_state())
         cls.augmentations.add(instance)
         instance.load()
 

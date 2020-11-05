@@ -32,6 +32,10 @@ from ....models.filters import TextFilter
 
 if IS_WIN:
     import flair
+else:
+    import rpyc
+    c = rpyc.connect('localhost', 18861)
+    flair = c.root
 
 
 class Roster:
@@ -63,11 +67,10 @@ class Roster:
         self.widget.reloadButton.clicked.connect(self.populateTree)
         self.widget.importExportButton.clicked.connect(self.export)
 
-        if IS_WIN:
-            flair.events.character_changed.connect(self.onCharacterChanged)
-            flair.events.credits_changed.connect(self.onCharacterChanged)
-            flair.events.system_changed.connect(self.onCharacterChanged)
-            flair.events.docked.connect(self.onCharacterChanged)
+        flair.events.character_changed.connect(self.onCharacterChanged)
+        flair.events.credits_changed.connect(self.onCharacterChanged)
+        flair.events.system_changed.connect(self.onCharacterChanged)
+        flair.events.docked.connect(self.onCharacterChanged)
 
     def onSelectedRowChanged(self, selection: List[QtGui.QStandardItem]):
         """Enable or disable buttons based on the type of selection."""
@@ -138,8 +141,8 @@ class Roster:
         try:
             character = self.tree.model().sourceModel().findItems(name, QtCore.Qt.MatchRecursive)[0]
         except IndexError:
-            newCharacter = self.addCharacter(account, flair.state.name, flair.state.credits or 0,
-                                             flair.state.system or '', flair.state.base or '', logged, '')
+            newCharacter = self.addCharacter(account, flair.get_state().name, flair.get_state().credits or 0,
+                                             flair.get_state().system or '', flair.get_state().base or '', logged, '')
             logging.info(f'Added character {name!r}')
             character = newCharacter[0]
             self.tree.reset()
@@ -167,9 +170,8 @@ class Roster:
         self.tree.expandAll()
 
     def onCharacterChanged(self, **kwargs):
-        assert IS_WIN
-        kwargs.update(name=flair.state.name)
-        self.updateCharacter(account=flair.state.account, **kwargs)
+        kwargs.update(name=flair.get_state().name)
+        self.updateCharacter(account=flair.get_state().account, **kwargs)
         self.serialise()
 
     def onDataChanged(self, topLeft: QtCore.QModelIndex, bottomRight: QtCore.QModelIndex):

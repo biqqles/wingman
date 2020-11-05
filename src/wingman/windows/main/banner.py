@@ -22,6 +22,10 @@ from PyQt5 import QtCore, QtWidgets
 from ... import IS_WIN
 if IS_WIN:
     import flair
+else:
+    import rpyc
+    c = rpyc.connect('localhost', 18861)
+    flair = c.root
 
 
 class FlairBanner(QtWidgets.QLabel):
@@ -32,11 +36,10 @@ class FlairBanner(QtWidgets.QLabel):
         self.setTextFormat(QtCore.Qt.RichText)
         self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
 
-        if IS_WIN:
-            self.timer = QtCore.QTimer(self)
-            self.timer.setInterval(self.UPDATE_INTERVAL)
-            self.timer.timeout.connect(self.updateContents)
-            self.timer.start()
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(self.UPDATE_INTERVAL)
+        self.timer.timeout.connect(self.updateContents)
+        self.timer.start()
 
         self.updateContents()
         self.updatePosition()
@@ -44,10 +47,10 @@ class FlairBanner(QtWidgets.QLabel):
     def updateContents(self):
         """Update the contents of the banner, using its template."""
         try:
-            if not IS_WIN or not flair.state.running:
+            if not flair.get_state().running:
                 self.hide()
             else:
-                self.setText(self.TEMPLATE.format(flair.state.name, flair.state.system, flair.state.credits or 0))
+                self.setText(self.TEMPLATE.format(flair.get_state().name, flair.get_state().system, flair.get_state().credits or 0))
                 self.show()
         except AttributeError:  # flair has not been initialised yet
             self.hide()

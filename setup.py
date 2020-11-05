@@ -37,7 +37,7 @@ setup(
     install_requires=[
         'dataclassy',
         'fl-flint>=0.3',
-        'fl-flair; platform_system=="Windows"',
+        'fl-flair',
         'ago',
         'Pillow',
         'PyQt5',
