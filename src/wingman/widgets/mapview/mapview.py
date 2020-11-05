@@ -111,9 +111,8 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         self.backB.setEnabled(bool(len(self.backStack) - 1))
         self.forwardB.setEnabled(bool(self.forwardsStack))
 
-        # get the nickname of the currently displayed entity and emit loadCompleted if required
-        self.page().runJavaScript('currentSystemNickname',
-                                  lambda n: self.displayChanged.emit(n) if n != 'Sirius' else None)
+        # get the nickname of the currently displayed entity and emit displayChanged
+        self.page().runJavaScript('currentSystemNickname', self.emitDisplayChanged)
 
     def displayEntity(self, entity: fl.entities.Entity):
         """Change the displayed object (system or solar) to the given item."""
@@ -142,6 +141,14 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         url.setFragment(f'q={entityName}&{noClick}')
         self.setUrl(url)
         self.onUrlChange()
+
+    def emitDisplayChanged(self, newNickname: str):
+        """Emit displayChanged if required."""
+        try:
+            if newNickname != 'Sirius':
+                self.displayChanged.emit(newNickname)
+        except RuntimeError:  # thrown if process is killed
+            return
 
     def setState(self, selector: str, state: bool):
         """Set the state of a switch in the navmap using its selector."""
