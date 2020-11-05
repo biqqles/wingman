@@ -18,15 +18,17 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file contains the application's entry point - main().
 """
+import sys
+
 from PyQt5 import QtWidgets
-
-import os
-
 import flint as fl
 
 from wingman import app, config, IS_WIN  # non-relative imports for the benefit of PyInstaller
 from wingman.windows.main.layout import MainWindow
 from wingman.windows.boxes import configuration
+
+if IS_WIN:
+    import flair
 
 
 def main() -> int:
@@ -37,7 +39,6 @@ def main() -> int:
     fl.paths.set_install_path(config.paths['freelancer_dir'])
 
     if IS_WIN:
-        import flair
         try:
             flair.set_install_path(config.paths['freelancer_dir'])
         except PermissionError:
@@ -55,4 +56,7 @@ def main() -> int:
 
 
 if __name__ == '__main__':
-    os._exit(main())  # bad! but sys.exit isn't working for some reason (not to do with excepthook)
+    result = main()
+    if IS_WIN:
+        flair.state.end_polling()
+    sys.exit(result)
