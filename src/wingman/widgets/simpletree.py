@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-from typing import List, Iterator
+from typing import List
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from ..models import items
+from .simpletable import SimpleTable
 
 
 class SimpleTree(QtWidgets.QTreeView):
@@ -29,7 +29,7 @@ class SimpleTree(QtWidgets.QTreeView):
     class FixedHeightDelegate(QtWidgets.QStyledItemDelegate):
         def sizeHint(self, option, index):
             size = super().sizeHint(option, index)
-            size.setHeight(26)
+            size.setHeight(SimpleTable.defaultRowHeight())
             return size
 
     def __init__(self, header: List[str]):
@@ -37,13 +37,11 @@ class SimpleTree(QtWidgets.QTreeView):
         # configure model
         self.itemModel = QtGui.QStandardItemModel()
         self.itemModel.setHorizontalHeaderLabels(header)
-        self.itemModel.setItemPrototype(items.GenericItem(''))
+        self.itemModel.dataChanged.connect(self.resizeColumnsToContents)
         self.setModel(self.itemModel)
 
         # configure view
-        self.delegate = self.FixedHeightDelegate()
-        self.setItemDelegate(self.delegate)
-
+        self.setItemDelegate(self.FixedHeightDelegate())
         self.setSortingEnabled(True)
         self.setHeaderHidden(False)
         self.setDropIndicatorShown(True)
@@ -54,23 +52,21 @@ class SimpleTree(QtWidgets.QTreeView):
         self.setUniformRowHeights(True)
         self.setAnimated(True)
 
-    def allItems(self) -> Iterator[QtGui.QStandardItem]:
-        root = self.itemModel.invisibleRootItem()
-
-        def recurse(parent):
-            for row in range(parent.rowCount()):
-                for column in range(parent.columnCount()):
-                    child = parent.child(row, column)
-                    yield child
-                    if child is not None and child.hasChildren():
-                        yield from recurse(child)
-
-        yield from recurse(root)
-
     def getSelectedRow(self) -> List[QtGui.QStandardItem]:
+        """Return a list of the items in the currently selected row."""
         return [i.model().sourceModel().itemFromIndex(i.model().mapToSource(i)) for i in self.selectedIndexes()]
 
     def selectionChanged(self, selected: QtCore.QItemSelection, deselected: QtCore.QItemSelection):
+        """Emit a signal when the selected row is changed."""
         if not selected.indexes():
             return
         self.rowSelected.emit(self.getSelectedRow())
+
+    def horizontalHeaderLabels(self) -> List[str]:
+        """Return the model's horizontal header labels (see setHorizontalHeaderLabels)"""
+        return [self.itemModel.headerData(i, QtCore.Qt.Horizontal) for i in range(self.itemModel.columnCount())]
+
+    def resizeColumnsToContents(self):
+        """Resize all columns to their contents."""
+        for column in range(self.itemModel.columnCount()):
+            self.resizeColumnToContents(column)

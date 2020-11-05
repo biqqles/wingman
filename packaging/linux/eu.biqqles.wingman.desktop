@@ -1,11 +1,11 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
-Version=0.1.1
+Version=0.2
 Type=Application
 Name=Wingman
 Comment=A companion for Discovery Freelancer
-Exec=wingman
-Icon=../icons/hicolor/256x256/apps/wingman.png
+Exec=sh -c 'wingman || $HOME/.local/bin/wingman'
+Icon=wingman
 Categories=Game;Qt
 Terminal=false
 StartupNotify=true

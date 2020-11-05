@@ -47,7 +47,7 @@ class MerchantTab(QtWidgets.QWidget):
         self.controlsLayout.addWidget(self.originMapButton)
 
         self.controlsLayout.addSpacing(25)
-        self.swapButton = buttons.SquareButton('⇆', parent=self)  # todo: turn this into an icon
+        self.swapButton = buttons.SquareButton(parent=self, icon=icons.swap, tooltip='Swap systems')
         self.swapButton.setToolTip('Swap systems')
         self.controlsLayout.addWidget(self.swapButton)
 

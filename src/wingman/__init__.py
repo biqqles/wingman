@@ -19,7 +19,7 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file initialises the application.
 """
 __app__ = 'Wingman'
-__version__ = 'v0.1.3'
+__version__ = 'v0.2'
 __description__ = 'A companion for Discovery Freelancer'
 
 import os
@@ -59,8 +59,21 @@ logging.basicConfig(level=logging.INFO,
                             logging.StreamHandler()
                         ]
                     )
-sys.excepthook = lambda *args: sys.__excepthook__(*args) if args[0] is KeyboardInterrupt \
-                                                         else logging.error('Uncaught exception!', exc_info=args)
+
+
+def exception_hook(ex_type, value, traceback):
+    """Handle uncaught exceptions. Log to file and stdout and, if a window is showing, to an error dialogue."""
+    if ex_type is KeyboardInterrupt:
+        return sys.__excepthook__(ex_type, value, traceback)
+
+    logging.error('Uncaught exception!', exc_info=(ex_type, value, traceback))
+
+    if app.activeWindow():
+        QtWidgets.QErrorMessage(app.activeWindow()).showMessage(repr(value), repr(value))
+
+
+sys.excepthook = exception_hook
+
 
 logging.info('Application start')
 logging.info(f'Working directory: {os.getcwd()}')

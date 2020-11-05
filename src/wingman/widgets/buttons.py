@@ -18,17 +18,16 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtWidgets
 
-from .. import icons, IS_WIN
+from .. import icons
 
 
 class SquareButton(QtWidgets.QToolButton):
     """A button whose width is fixed to its height, so that it always remains square, while adjusting its side length
     to match its layout."""
 
-    def __init__(self, text='', tooltip='', icon=None, edge=0, parent=None):
+    def __init__(self, parent=None, icon=None, tooltip=''):
         """Initialise the widget with parameters passed to constructor."""
         super().__init__(parent)
-        self.setText(text)
         self.setToolTip(tooltip)
         if icon:
             self.setIcon(icon)
@@ -36,11 +35,6 @@ class SquareButton(QtWidgets.QToolButton):
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum))
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self.setStyleSheet('QToolButton::menu-indicator { width: 0; image: none }')  # hide dropdown arrow indicator
-        if edge:
-            self.setMinimumSize(edge, edge)
-
-        if IS_WIN:  # symbols are weirdly small in Segoe UI
-            self.setStyleSheet(self.styleSheet() + 'QToolButton { font-size: 18px }')
 
     def resizeEvent(self, event):
         """Handle a resize event so that the widget stays square."""
@@ -52,4 +46,4 @@ class UniverseMapButton(SquareButton):
 
     def __init__(self, parent=None):
         """Initialise a SquareButton with some default values."""
-        super().__init__(tooltip='Open universe map', icon=icons.universemap, parent=parent)
+        super().__init__(parent, icon=icons.universe, tooltip='Open universe map')

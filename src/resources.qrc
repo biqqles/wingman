@@ -2,14 +2,20 @@
   <qresource prefix="light">
     <file alias="expand">../icons/light/expand.png</file>
     <file alias="jump">../icons/light/jump.png</file>
-    <file alias="universemap">../icons/light/universemap.png</file>
+    <file alias="universe">../icons/light/universe.png</file>
     <file alias="cc">../icons/light/cc.png</file>
+    <file alias="left">../icons/light/left.png</file>
+    <file alias="right">../icons/light/right.png</file>
+    <file alias="swap">../icons/light/swap.png</file>
   </qresource>
   <qresource prefix="dark">
     <file alias="expand">../icons/dark/expand.png</file>
     <file alias="jump">../icons/dark/jump.png</file>
-    <file alias="universemap">../icons/dark/universemap.png</file>
+    <file alias="universe">../icons/dark/universe.png</file>
     <file alias="cc">../icons/dark/cc.png</file>
+    <file alias="left">../icons/dark/left.png</file>
+    <file alias="right">../icons/dark/right.png</file>
+    <file alias="swap">../icons/dark/swap.png</file>
   </qresource>
   <qresource prefix="general">
     <file alias="main">../icons/general/wingman.svg</file>

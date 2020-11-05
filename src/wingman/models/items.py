@@ -34,6 +34,7 @@ class GenericItem(QtGui.QStandardItem):
         self.putData(initialData)
         self.setEditable(False)
         self.setDragEnabled(False)
+        self.setDropEnabled(False)
 
     def putData(self, data: T):
         """An abstraction over setData(). Sets data and updates the textual representation."""
@@ -137,7 +138,7 @@ class NumberItem(GenericItem):
     """An item holding a number."""
     @staticmethod
     def represent(number):
-        return f'{number:,}' if type(number) is int else f'{number:.2f}'
+        return f'{number:,}' if type(number) is int else f'{number:,.2f}'
 
     def __lt__(self, other):
         return self.getData() < other.getData()

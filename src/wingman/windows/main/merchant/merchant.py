@@ -18,21 +18,21 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import Tuple, Optional
 from collections import defaultdict
-from io import BytesIO
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PIL import Image, ImageQt
 import flint as fl
 
-from .... import config
+from .... import config, icons
 from ...boxes import expandedmap
 from ....models import items, selectors
 from .layout import MerchantTab
+from ..navmap.navmap import Navmap
 
 
 class Merchant:
-    """Contains methods related to the 'Merchant' tab."""
-    def __init__(self, widget: MerchantTab, expandedMap: expandedmap.ExpandedMap, navmap):
+    """Implements the 'Merchant' tab's behaviour."""
+
+    def __init__(self, widget: MerchantTab, expandedMap: expandedmap.ExpandedMap, navmap: Navmap):
         # initialise Merchant tab
         self.config = config['merchant']
         self.widget = widget
@@ -60,7 +60,6 @@ class Merchant:
         self.widget.swapButton.clicked.connect(self.swapSystems)
 
         # customise table and model
-        self.widget.mainTable.doubleClicked.connect(lambda index: self.displayBaseInNavmap(index))
         self.widget.mainTable.selectionModel().selectionChanged.connect(self.onSelectedRowChanged)
 
         # finally, display last settings
@@ -70,7 +69,8 @@ class Merchant:
     def openUniverseMap(self, selector: QtWidgets.QComboBox):
         """Open the universe map, passing its choice to the given combo box."""
         self.expandedMap.displayUniverse()
-        self.expandedMap.displayChanged.connect(lambda n: selector.setCurrentIndex(selector.findData(items.fl.systems[n])))
+        self.expandedMap.displayChanged.connect(lambda n:
+                                                selector.setCurrentIndex(selector.findData(items.fl.systems[n])))
 
     def onDestinationToggled(self, toggled: bool):
         """Handle the specific destination check box being toggled."""
@@ -96,23 +96,14 @@ class Merchant:
 
         # display commodity name
         links = []
-        for system in items.fl.maps.inter_system_route(originBase._system, destinationBase._system):
+        for system in items.fl.maps.inter_system_route(originBase.system(), destinationBase.system()):
             links.append(f'<a href="{system.nickname}">{system.name()}</a>')
         self.widget.infoRouteLabel.setText('Route: ' + ', '.join(links))
         self.widget.infoRouteLabel.linkActivated.connect(lambda n: self.navmap.showFromExternal(items.fl.systems[n]))
 
     def updateInfoPanel(self, data: items.ProfitItem.ProfitData):
         """Update the info side panel."""
-        # load and display commodity icon
-        icon = data.commodity.icon()
-        image = QtGui.QImage.fromData(icon, 'TGA')
-        # some icons fail to load into QImages with PyQt5 itself. I am yet to ascertain why. When this happens we
-        # can use Pillow to load the file instead since they work fine with it. 0x3039 seems to be the first pixel value
-        # on failure to load, don't know why.
-        if image.pixel(QtCore.QPoint(0, 0)) == 0x3039:
-            image = ImageQt.ImageQt(Image.open(BytesIO(icon)))
-        pixmap = QtGui.QPixmap.fromImage(image)
-        self.widget.infoIcon.setPixmap(pixmap)
+        self.widget.infoIcon.setPixmap(icons.loadTGA(data.commodity.icon()))  # update commodity icon
 
         # update labels
         self.widget.infoNameLabel.setText(f'<b>{data.commodity.name()}</b>')
@@ -122,10 +113,12 @@ class Merchant:
     def display(self):
         """Display a table of the best commodities to take to and from the selected systems."""
         originSystem = self.widget.originSelector.itemData(self.widget.originSelector.currentIndex())
-        destinationSystem = self.widget.destinationSelector.itemData(self.widget.destinationSelector.currentIndex()) if \
-            self.widget.destinationLabel.isChecked() else None
-        iff = self.widget.reputationSelector.itemData(self.widget.reputationSelector.currentIndex()) if \
-            self.widget.reputationLabel.isChecked() else None
+        destinationSystem = self.widget.destinationSelector.itemData(self.widget.destinationSelector.currentIndex()) \
+            if self.widget.destinationLabel.isChecked() else None
+        iff = self.widget.reputationSelector.itemData(self.widget.reputationSelector.currentIndex()) \
+            if self.widget.reputationLabel.isChecked() else None
+
+        self.widget.swapButton.setEnabled(bool(destinationSystem))
 
         data = self.calculateRoutes(originSystem, destinationSystem, iff)
         self.widget.mainTable.populate(list(data))
@@ -140,12 +133,13 @@ class Merchant:
         self.selectedSystems = reversed(self.selectedSystems)
 
     @property
-    def selectedSystems(self):
+    def selectedSystems(self) -> Tuple[fl.entities.System, fl.entities.System]:
         """Return the entities of the selected origin and destination system, respectively."""
-        return self.widget.originSelector.currentText(), self.widget.destinationSelector.currentText()
+        return self.widget.originSelector.currentData(), self.widget.destinationSelector.currentData()
 
     @selectedSystems.setter
     def selectedSystems(self, newSystems: Tuple[items.fl.entities.System, items.fl.entities.System]):
+        """Set the selected origin and destination system."""
         origin, destination = newSystems
         if origin:
             self.widget.originSelector.setCurrentIndex(self.widget.originSelector.findData(origin))
@@ -154,14 +148,13 @@ class Merchant:
         else:
             self.widget.destinationSelector.setCurrentText('')
 
-    def onUserDisplayRequested(self, origin, destination):
-        self.setSystems(origin, destination)
-        self.widget.tw.setCurrentIndex(1)
-
     @staticmethod
     def calculateRoutes(origin: items.fl.entities.System, destination: items.Optional[items.fl.entities.System] = None,
                         iff: items.Optional[items.fl.entities.Faction] = None):
-
+        """Calculate the optimum commodities to trade between system A (`origin`) and system B (`destination`).
+        The latter is optional; if it is not provided the function will return the optimum commodities to buy in
+        system A and sell at any location. The optional `iff` parameter allows the bases to be searched to be restricted
+        to those dockable by that faction."""
         originSells = defaultdict(list)
         for base in origin.bases():
             if iff and not iff.can_dock_at(base):

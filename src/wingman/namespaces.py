@@ -22,8 +22,10 @@ application.
 import atexit
 import configparser
 import logging
+from io import BytesIO
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PIL import Image, ImageQt
 
 
 class Configuration(configparser.ConfigParser):
@@ -81,7 +83,7 @@ class Configuration(configparser.ConfigParser):
 class Icons:
     """Set the icons of the interface depending on whether the background colour is light (meaning that dark icons
     should be used) or dark (meaning that light icons should be used)"""
-    monochrome = ['universemap', 'jump', 'expand', 'open', 'cc']
+    monochrome = ['universe', 'jump', 'expand', 'open', 'cc', 'left', 'right', 'swap']
 
     def __init__(self):
         prefix = ':/dark/' if self.determineLuminance() else ':/light/'
@@ -106,3 +108,10 @@ class Icons:
         colour = button.palette().color(button.backgroundRole())
         luminance = sum(colour.getRgb()) / 3
         return luminance > threshold
+
+    @staticmethod
+    def loadTGA(tga: bytes) -> QtGui.QPixmap:
+        """Load a TGA image as a QPixmap. For some reason, some images accepted by Freelancer do not load in PyQt - but
+        they do with the help of Pillow."""
+        image = ImageQt.ImageQt(Image.open(BytesIO(tga)))
+        return QtGui.QPixmap.fromImage(image)
