@@ -26,7 +26,7 @@ import flint as fl
 
 from wingman import app, config, IS_WIN  # non-relative imports for the benefit of PyInstaller
 from wingman.windows.main.layout import MainWindow
-from wingman.windows.boxes import configuration, loading
+from wingman.windows.boxes import configuration
 
 
 def main() -> int:
@@ -50,8 +50,6 @@ def main() -> int:
             return 1
 
     mainWindow = MainWindow()
-
-    loading.LoadingFiles().exec()
 
     return app.exec()
 

@@ -25,7 +25,7 @@ from PyQt5 import QtWidgets
 from flint import cached
 
 from ... import config, __app__
-from . import merchant, navmap, roster, banner, menus
+from . import merchant, navmap, roster, banner, menus, loading
 from .navmap.navmap import Navmap
 from .merchant.merchant import Merchant
 from .roster.roster import Roster
@@ -89,6 +89,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.show()
         self.tw.currentChanged.emit(0)
+
+        self.indicator = loading.Indicator(self.statusBar())
 
     def resizeEvent(self, event):
         """Ensure banner "sticks" to the top right of the window."""
