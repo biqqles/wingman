@@ -24,6 +24,7 @@ __description__ = 'A companion for Discovery Freelancer'
 
 import os
 import logging
+import signal
 import sys
 
 # noinspection PyUnresolvedReferences
@@ -78,6 +79,7 @@ def exception_hook(ex_type, value, traceback):
 
 
 sys.excepthook = exception_hook
+signal.signal(signal.SIGINT, signal.SIG_DFL)  # force Python to handle SIGINT even during app.exec
 
 
 logging.info('Application start')
