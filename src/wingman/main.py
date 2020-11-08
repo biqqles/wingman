@@ -35,18 +35,32 @@ else:
     if 'wine_prefix_dir' not in config.paths:
         configuration.ConfigurePaths(mandatory=True).exec()
     import rpyc
-    subprocess.Popen([
-        'sudo', 'python3', '-m', 'flair',
-        '-r', '-p', '18861',
-        config.paths['freelancer_dir'], config.paths['wine_prefix_dir']
-    ])
+
+    # Check if flair is already running
     c = None
-    while not c:
-        try:
-            c = rpyc.connect('localhost', 18861)
-        except ConnectionRefusedError:
-            print('Waiting for flair...')
-            time.sleep(1)
+    try:
+        c = rpyc.connect('localhost', 18861)
+    except ConnectionRefusedError:
+        pass
+
+    if not c:
+        flair_command = ['pkexec', 'env']
+        for key, value in os.environ.items():
+            flair_command.append(f'{key}={value}')
+
+        flair_command.extend([
+            'python3', '-m', 'flair',
+            '-r', '-p', '18861',
+            config.paths['freelancer_dir'], config.paths['wine_prefix_dir']
+        ])
+        print(flair_command)
+        subprocess.Popen(flair_command)
+        while not c:
+            try:
+                c = rpyc.connect('localhost', 18861)
+            except ConnectionRefusedError:
+                print('Waiting for flair...')
+                time.sleep(1)
 
     flair = c.root
 
