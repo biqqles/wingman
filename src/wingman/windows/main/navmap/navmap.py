@@ -23,15 +23,8 @@ from PyQt5 import QtCore, QtWidgets
 
 from ....widgets import mapview
 from ...boxes import expandedmap
-from .... import config, IS_WIN
+from .... import config, IS_WIN, flair
 from .layout import NavmapTab
-
-if IS_WIN:
-    import flair
-else:
-    import rpyc
-    c = rpyc.connect('localhost', 18861)
-    flair = c.root
 
 
 class Navmap:

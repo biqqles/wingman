@@ -26,6 +26,8 @@ import os
 import logging
 import signal
 import sys
+import subprocess
+import time
 
 # noinspection PyUnresolvedReferences
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets  # WebEngine must be imported here before QApp init
@@ -33,6 +35,7 @@ from . import resources  # register resources
 from . import namespaces
 
 IS_WIN = (sys.platform.startswith('win32'))
+
 
 # paths relative to app data directory
 NAVMAP_DIR = 'navmap'
@@ -90,7 +93,42 @@ if IS_WIN:
     font.setFamily('Segoe UI')
     font.setPointSizeF(font.pointSize() * 1.2)
     app.setFont(font)
+
+    import flair
+
 else:
     if QtWidgets.QStyleFactory.keys() == ['Windows', 'Fusion']:
         logging.warning("Native Qt style not available. Defaulting to Fusion - the application may not render "
                         "correctly. To fix this, install the PyQt5 packages from your distro's repos, not pip.")
+
+    from wingman.windows.boxes import configuration
+    if 'wine_prefix_dir' not in config.paths:
+        configuration.ConfigurePaths(mandatory=True).exec()
+    import rpyc
+
+    # Check if flair is already running
+    c = None
+    try:
+        c = rpyc.connect('localhost', 18861)
+    except ConnectionRefusedError:
+        pass
+
+    if not c:
+        flair_command = ['pkexec', 'env']
+        for key, value in os.environ.items():
+            flair_command.append(f'{key}={value}')
+
+        flair_command.extend([
+            'python3', '-m', 'flair',
+            '-r', '-p', '18861',
+            config.paths['freelancer_dir'], config.paths['wine_prefix_dir']
+        ])
+        subprocess.Popen(flair_command)
+        while not c:
+            try:
+                c = rpyc.connect('localhost', 18861)
+            except ConnectionRefusedError:
+                print('Waiting for flair...')
+                time.sleep(1)
+
+    flair = c.root

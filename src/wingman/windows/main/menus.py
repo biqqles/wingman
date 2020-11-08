@@ -28,16 +28,9 @@ import flint as fl
 
 from ..database import layout
 from ..boxes import configuration, about
-from ... import config, IS_WIN
+from ... import config, IS_WIN, flair
 
-if IS_WIN:
-    import flair
-    from flair.augment import cli, clipboard, screenshot
-else:
-    import rpyc
-    c = rpyc.connect('localhost', 18861)
-    flair = c.root
-    from flair.augment import cli, clipboard, screenshot
+from flair.augment import cli, clipboard, screenshot
 
 
 class SimpleAction(QAction):

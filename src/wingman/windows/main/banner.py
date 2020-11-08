@@ -19,13 +19,7 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file defines the interface of the application's main window.
 """
 from PyQt5 import QtCore, QtWidgets
-from ... import IS_WIN
-if IS_WIN:
-    import flair
-else:
-    import rpyc
-    c = rpyc.connect('localhost', 18861)
-    flair = c.root
+from ... import IS_WIN, flair
 
 
 class FlairBanner(QtWidgets.QLabel):

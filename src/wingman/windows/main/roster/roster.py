@@ -22,18 +22,11 @@ import os.path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from .... import IS_WIN
+from .... import flair
 from .layout import RosterTab
 from ....models import items
 from ....models.filters import TextFilter
 from ....models.special.accounts import AccountsModel
-
-if IS_WIN:
-    import flair
-else:
-    import rpyc
-    c = rpyc.connect('localhost', 18861)
-    flair = c.root
 
 
 class Roster:
