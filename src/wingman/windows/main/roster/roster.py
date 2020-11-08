@@ -139,8 +139,8 @@ class Roster:
 
     def onCharacterUpdate(self, **kwargs):
         """Handle a character record update from flair."""
-        name = kwargs.setdefault('name', flair.state.name)
-        account = kwargs.setdefault('account', flair.state.account)
+        name = kwargs.setdefault('name', flair.get_state().name)
+        account = kwargs.setdefault('account', flair.get_state().account)
         updateTime = QtCore.QDateTime.currentDateTime()
 
         logging.info(f'Character update ({name}/{account}) received: {kwargs}')
@@ -152,8 +152,8 @@ class Roster:
             self.model.updateCharacter(logged=updateTime, **kwargs)
             logging.info(f'Updating character')
         else:
-            self.model.addCharacter(self.model.findAccount(account), name, flair.state.credits or 0,
-                                    flair.state.system or '', flair.state.base or '', updateTime, '')
+            self.model.addCharacter(self.model.findAccount(account), name, flair.get_state().credits or 0,
+                                    flair.get_state().system or '', flair.get_state().base or '', updateTime, '')
             logging.info(f'Adding new character')
 
         self.tree.reset()
