@@ -10,7 +10,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name='wingman',
-    version='0.2',
+    version='0.3',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
@@ -27,7 +27,8 @@ setup(
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Development Status :: 4 - Beta',
-        'Operating System :: OS Independent',
+        'Operating System :: POSIX :: Linux',
+        'Operating System :: Microsoft :: Windows',
         'Topic :: Games/Entertainment',
         'Intended Audience :: End Users/Desktop',
         'Environment :: X11 Applications :: Qt',
@@ -35,9 +36,9 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy>=0.5',
-        'fl-flint>=0.7',
-        'fl-flair',
+        'dataclassy>=0.6.1',
+        'fl-flint>=0.7.1',
+        'fl-flair>=0.4.1',
         'ago',
         'Pillow',
         'PyQt5',

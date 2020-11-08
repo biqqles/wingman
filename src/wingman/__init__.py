@@ -19,11 +19,12 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file initialises the application.
 """
 __app__ = 'Wingman'
-__version__ = 'v0.2'
+__version__ = 'v0.3'
 __description__ = 'A companion for Discovery Freelancer'
 
 import os
 import logging
+import signal
 import sys
 
 # noinspection PyUnresolvedReferences
@@ -73,6 +74,7 @@ def exception_hook(ex_type, value, traceback):
 
 
 sys.excepthook = exception_hook
+signal.signal(signal.SIGINT, signal.SIG_DFL)  # force Python to handle SIGINT even during app.exec
 
 
 logging.info('Application start')
