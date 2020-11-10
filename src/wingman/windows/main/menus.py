@@ -88,7 +88,7 @@ def openFile(path: str):
 
 def startLauncher():
     """Start the Discovery launcher in the configured installation directory."""
-    subprocess.call(fl.paths.construct_path('DSLauncher.exe'), cwd=config.install)
+    subprocess.Popen(fl.paths.construct_path('DSLauncher.exe'), cwd=config.install)
 
 
 class Utilities(SimpleMenu):
