@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List, Type
+from math import degrees
 
 from PyQt5 import QtWidgets
 
@@ -377,7 +378,7 @@ class ShieldsPage(EquipmentPage):
             [
                 EntityItem(shield),
                 CreditsItem(shield.price()),
-                GenericItem(shield.shield_type),
+                MonospaceItem(shield.shield_type),
                 NumberItem(shield.max_capacity),
                 NumberItem(shield.explosion_resistance),
                 NumberItem(shield.volume),
@@ -392,9 +393,9 @@ class ShieldsPage(EquipmentPage):
 
 class ShipsPage(EquipmentPage):
     """Database page displaying ships."""
-    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points', 'Hold size', 'Bots', 'Bats',
-                         'Max impulse (ms⁻¹)', 'Max reverse (ms⁻¹)', 'Cruise charge (s)',
-                         'Nickname', 'Name ID', 'Info ID']
+    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points', 'Turn rate (°/s)', 'Hold size', 'Bots',
+                         'Bats', 'Power core', 'Recharge', 'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)',
+                         'Cruise delay (s)', 'Nickname', 'Name ID', 'Info ID']
 
     def populate(self):
         self.mainTable.populate([[
@@ -402,16 +403,19 @@ class ShipsPage(EquipmentPage):
                 GenericItem(ship.type()),
                 CreditsItem(ship.price()),
                 NumberItem(ship.hit_pts),
+                NumberItem(degrees(ship.turn_rate())),
                 NumberItem(ship.hold_size),
                 NumberItem(ship.nanobot_limit),
                 NumberItem(ship.shield_battery_limit),
+                NumberItem(ship.power_core().capacity),
+                NumberItem(ship.power_core().charge_rate),
                 NumberItem(ship.impulse_speed()),
                 NumberItem(ship.reverse_speed()),
                 NumberItem(ship.cruise_charge_time()),
                 MonospaceItem(ship.nickname),
                 GenericItem(ship.ids_name),
                 GenericItem(ship.ids_info),
-            ] for ship in fl.ships
+            ] for ship in fl.ships if ship.package()
         ])
 
 
