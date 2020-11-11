@@ -393,9 +393,11 @@ class ShieldsPage(EquipmentPage):
 
 class ShipsPage(EquipmentPage):
     """Database page displaying ships."""
-    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points', 'Turn rate (°/s)', 'Response (s)', 'Hold size',
-                         'Bots', 'Bats', 'Power core', 'Recharge', 'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)',
-                         'Cruise delay (s)', 'Nickname', 'Name ID', 'Info ID']
+    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points',
+                         'Turn rate (°/s)', 'Distance 0-0.5s (°)', 'Response (s)',
+                         'Hold size', 'Bots', 'Bats', 'Power core', 'Recharge',
+                         'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)', 'Cruise delay (s)',
+                         'Nickname', 'Name ID', 'Info ID']
 
     def populate(self):
         self.mainTable.populate([[
@@ -404,6 +406,7 @@ class ShipsPage(EquipmentPage):
                 CreditsItem(ship.price()),
                 NumberItem(ship.hit_pts),
                 NumberItem(degrees(ship.turn_rate())),
+                NumberItem(degrees(ship.angular_distance_in_time(0.5))),
                 NumberItem(ship.response()),
                 NumberItem(ship.hold_size),
                 NumberItem(ship.nanobot_limit),
