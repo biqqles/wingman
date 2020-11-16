@@ -26,6 +26,10 @@ import ago
 
 T = TypeVar('T')
 
+fontBold = QtGui.QFont()
+fontBold.setBold(True)
+fontMono = QtGui.QFontDatabase.systemFont(QtGui.QFontDatabase.FixedFont)
+
 
 class GenericItem(QtGui.QStandardItem):
     """A generic item with no data beyond its text."""
@@ -91,7 +95,7 @@ class BlankItem(GenericItem):
 class MonospaceItem(GenericItem):
     def __init__(self, data):
         super().__init__(data)
-        self.setFont(QtGui.QFontDatabase.systemFont(QtGui.QFontDatabase.FixedFont))
+        self.setFont(fontMono)
 
 
 class EntityItem(GenericItem):
@@ -207,9 +211,7 @@ class AccountItem(GenericItem):
 
     def __init__(self, account: Account):
         super().__init__(account)
-        font = self.font()
-        font.setBold(True)
-        self.setFont(font)
+        self.setFont(fontBold)
         self.setDropEnabled(True)
 
     @staticmethod
