@@ -167,8 +167,8 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
         for system, jumps in sorted(connections.items(), key=lambda s_j: s_j[0].name()):
             action = menu.addAction(f'{system.name()} ({", ".join(j.type() for j in jumps)})')
+            action.setToolTip('\n'.join(f'{j.type()}: [{j.sector()}]' for j in jumps))
             action.triggered.connect(lambda _, system=system: self.displayEntity(system))
-            action.setToolTip(", ".join(j.sector() for j in jumps))
         self.connInfoB.setMenu(menu)
 
     def saveAsImage(self):
