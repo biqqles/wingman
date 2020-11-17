@@ -30,9 +30,9 @@ class DatabasePage(QtWidgets.QSplitter):
     entity currently selected in the main table."""
     mainTableHeadings: List[str]
 
-    def __init__(self, parent, infocardView, secondaryWidget):
+    def __init__(self, parent, secondaryWidget):
         super().__init__(parent=parent, orientation=QtCore.Qt.Vertical)
-        self.infocardView = infocardView
+        self.infocardView = parent.infocardView
         self.secondaryWidget = secondaryWidget
 
         self.mainTable = SimpleTable(self.mainTableHeadings)
@@ -67,7 +67,7 @@ class BasesPage(DatabasePage):
     mainTableHeadings = ['Base', 'Owner', 'System', 'Sector', 'Region', 'Base Nickname', 'System Nickname',
                          'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         self.marketBox = QtWidgets.QGroupBox('Market')
         self.marketLayout = QtWidgets.QHBoxLayout()
         self.marketBox.setLayout(self.marketLayout)
@@ -78,7 +78,7 @@ class BasesPage(DatabasePage):
         self.marketLayout.addWidget(self.equipmentTable)
         self.marketLayout.addWidget(self.shipTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=self.marketBox)
+        super().__init__(parent, secondaryWidget=self.marketBox)
 
     def populate(self):
         self.mainTable.populate([
@@ -131,14 +131,14 @@ class CommoditiesPage(DatabasePage):
     """Database page for commodities."""
     mainTableHeadings = ['Commodity', 'Default price', 'Volume', 'Decay', 'Nickname', 'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         marketBox = QtWidgets.QGroupBox('Economy')
         marketLayout = QtWidgets.QHBoxLayout()
         marketBox.setLayout(marketLayout)
         self.economyTable = SimpleTable(['Base', 'System', 'Price', 'Sells'])
         marketLayout.addWidget(self.economyTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=marketBox)
+        super().__init__(parent, secondaryWidget=marketBox)
 
     def populate(self):
         self.mainTable.populate([
@@ -175,14 +175,14 @@ class EquipmentPage(DatabasePage):
     mainTableHeadings = ['Name', 'Price', 'Nickname', 'Name ID', 'Info ID']
     equipmentType: Type[fl.entities.Equipment] = fl.entities.Equipment
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         availabilityBox = QtWidgets.QGroupBox('Availability')
         availabilityLayout = QtWidgets.QHBoxLayout()
         availabilityBox.setLayout(availabilityLayout)
         self.economyTable = SimpleTable(['Base', 'System', 'IFF'])
         availabilityLayout.addWidget(self.economyTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=availabilityBox)
+        super().__init__(parent, secondaryWidget=availabilityBox)
 
     def populate(self):
         """This base implementation populates the main table with fields common to all equipment types."""
@@ -427,14 +427,14 @@ class FactionsPage(DatabasePage):
     """Database page displaying factions."""
     mainTableHeadings = ['Faction', 'Short name', 'Legality', 'Nickname', 'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         self.sheetBox = QtWidgets.QGroupBox('Rep sheet')
         sheetLayout = QtWidgets.QHBoxLayout()
         self.sheetBox.setLayout(sheetLayout)
         self.sheetTable = SimpleTable(['Faction', 'Reputation towards'])
         sheetLayout.addWidget(self.sheetTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=self.sheetBox)
+        super().__init__(parent, secondaryWidget=self.sheetBox)
 
     def populate(self):
         self.mainTable.populate([[

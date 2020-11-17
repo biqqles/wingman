@@ -47,7 +47,7 @@ class Database(QtWidgets.QDialog):
         self.mainLayout.addWidget(viewSelector, 0)
 
         self.infocardView = InfocardView(self)
-        self.currentPage = BasesPage(self, self.infocardView)
+        self.currentPage = BasesPage(self)
         self.mainSplitter = QtWidgets.QSplitter()
         self.mainSplitter.addWidget(self.currentPage)
         self.mainSplitter.setCollapsible(0, False)
