@@ -28,7 +28,7 @@ from ...widgets.scrollablelist import ScrollableList
 class Database(QtWidgets.QDialog):
     """The Database dialogue provides a spreadsheet-esque window into every entity defined in Freelancer. It more or
     less replicates the functionality of FLStat, using flint as a backend."""
-    title = f'Database'
+    title = 'Database'
     defaultDimensions = (1400, 800)
 
     def __init__(self):
@@ -48,8 +48,11 @@ class Database(QtWidgets.QDialog):
 
         self.infocardView = InfocardView(self)
         self.currentPage = BasesPage(self, self.infocardView)
-        self.mainLayout.addWidget(self.currentPage, 4)
-        self.mainLayout.addWidget(self.infocardView, 2)
+        self.mainSplitter = QtWidgets.QSplitter()
+        self.mainSplitter.addWidget(self.currentPage)
+        self.mainSplitter.setCollapsible(0, False)
+        self.mainSplitter.addWidget(self.infocardView)
+        self.mainLayout.addWidget(self.mainSplitter)
         self.show()
 
     def onSelectorChanged(self, name):
@@ -58,7 +61,7 @@ class Database(QtWidgets.QDialog):
         newPage = self.pagesCache[HEADINGS[name]]
 
         self.currentPage.hide()
-        self.mainLayout.replaceWidget(self.currentPage, newPage)
+        self.mainSplitter.replaceWidget(0, newPage)
         self.currentPage = newPage
         self.currentPage.show()
 
