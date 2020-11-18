@@ -18,12 +18,12 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file defines the behaviour of the Navmap tab.
 """
-import flint as fl
 from PyQt5 import QtCore, QtWidgets
+import flint as fl
 
+from .... import config, IS_WIN
 from ....widgets import mapview
 from ...boxes import expandedmap
-from .... import config, IS_WIN
 from .layout import NavmapTab
 
 if IS_WIN:
@@ -38,8 +38,9 @@ class Navmap:
         self.searchableEntities = fl.systems + fl.bases
         self.currentlyDisplayed = self.searchableEntities.get(self.config['last'], self.searchableEntities['li01'])
         self.widget = widget
-        self.mapView: mapview.MapView = self.widget.navmap
         self.expandedMap = expandedMap
+        self.mapView: mapview.MapView = self.widget.navmap
+        self.tabWidget: QtWidgets.QTabWidget = self.widget.parent().parent()
 
         # set up search field with completer
         completer = QtWidgets.QCompleter()
@@ -129,4 +130,5 @@ class Navmap:
     def showFromExternal(self, entity: fl.entities.Entity):
         """Switch to the Navmap tab and show `entity` on the map."""
         self.mapView.displayEntity(entity)
-        self.widget.parent().setCurrentWidget(self.widget)  # todo: doesn't update tab bar
+        self.tabWidget.setCurrentWidget(self.widget)
+        self.widget.activateWindow()
