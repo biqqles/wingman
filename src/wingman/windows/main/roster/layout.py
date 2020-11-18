@@ -23,7 +23,8 @@ from .... import icons
 
 
 class RosterTab(QtWidgets.QWidget):
-    title = 'Roster'
+    title = '&Roster'
+    tooltip = 'Track your characters and their attributes'
     icon = icons.roster
 
     def __init__(self, parent: QtWidgets.QTabWidget):

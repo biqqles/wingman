@@ -26,7 +26,8 @@ from ....widgets.simpletable import SimpleTable
 
 class MerchantTab(QtWidgets.QWidget):
     """Defines the layout of the merchant tab."""
-    title = 'Merchant'
+    title = '&Merchant'
+    tooltip = 'Discover and plan trade routes'
     icon = icons.merchant
 
     def __init__(self, parent: QtWidgets.QTabWidget):

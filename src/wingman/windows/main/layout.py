@@ -54,21 +54,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Navmap tab
 
-        self.tabMap = navmap.layout.NavmapTab(self.tw)
-        self.tw.addTab(self.tabMap, self.tabMap.icon, self.tabMap.title)
-        self.tw.currentChanged.connect(self.cueLazyLoadTab(self.tabMap, self.navmap))
+        self.tabMap = self.addTab(navmap.layout.NavmapTab(self.tw), self.navmap)
 
         # Merchant tab
 
-        self.tabMer = merchant.layout.MerchantTab(self.tw)
-        self.tw.addTab(self.tabMer, self.tabMer.icon, self.tabMer.title)
-        self.tw.currentChanged.connect(self.cueLazyLoadTab(self.tabMer, self.merchant))
+        self.tabMer = self.addTab(merchant.layout.MerchantTab(self.tw), self.merchant)
 
         # Roster
 
-        self.tabRoster = roster.layout.RosterTab(self.tw)
-        self.tw.addTab(self.tabRoster, self.tabRoster.icon, self.tabRoster.title)
-        self.tw.currentChanged.connect(self.cueLazyLoadTab(self.tabRoster, self.roster))
+        self.tabRoster = self.addTab(roster.layout.RosterTab(self.tw), self.roster)
 
         self.centralLayout.addWidget(self.tw)
 
@@ -99,6 +93,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         """Write config to disk on close."""
         config.commit()
+
+    def addTab(self, page, load):
+        """Add a tab page to the central tab widget. Tab page titles should include an ampersand to provide them with
+        an Alt- hotkey."""
+        index = self.tw.addTab(page, page.icon, page.title)
+        self.tw.setTabToolTip(index, page.tooltip)
+        self.tw.currentChanged.connect(self.cueLazyLoadTab(page, load))
+        return page
 
     def cueLazyLoadTab(self, layout, load: Callable[[], Union[Navmap, Merchant, Roster]]):
         """Cue a tab to be lazy loaded."""
