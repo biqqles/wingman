@@ -29,6 +29,7 @@ class Database(QtWidgets.QDialog):
     """The Database dialogue provides a spreadsheet-esque window into every entity defined in Freelancer. It more or
     less replicates the functionality of FLStat, using flint as a backend."""
     title = 'Database'
+    tooltip = 'View game data in tabular form'
     defaultDimensions = (1400, 800)
 
     def __init__(self):
@@ -49,7 +50,6 @@ class Database(QtWidgets.QDialog):
         self.infocardView = InfocardView(self)
         self.currentPage = None
         self.mainSplitter = QtWidgets.QSplitter()
-        self.mainSplitter.setCollapsible(0, False)
         self.mainSplitter.addWidget(self.infocardView)
         self.mainLayout.addWidget(self.mainSplitter)
 
@@ -69,6 +69,7 @@ class Database(QtWidgets.QDialog):
             self.mainSplitter.replaceWidget(0, newPage)
         else:
             self.mainSplitter.insertWidget(0, newPage)
+            self.mainSplitter.setCollapsible(0, False)
 
         self.currentPage = newPage
         self.currentPage.show()

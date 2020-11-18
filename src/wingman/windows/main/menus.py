@@ -26,7 +26,7 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QMenu, QAction, QMenuBar, QFileDialog
 import flint as fl
 
-from ..database import layout
+from ..database.layout import Database
 from ..boxes import configuration, about
 from ... import config, IS_WIN
 
@@ -95,7 +95,7 @@ class Utilities(SimpleMenu):
     """'Utilities' menu."""
     title = '&Utilities'
     actions_ = [
-        SimpleAction('&Database', lambda: layout.Database().exec(), 'Ctrl+D'),
+        SimpleAction('&Database', lambda: Database().exec(), tooltip=Database.tooltip),
     ]
 
 
