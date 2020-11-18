@@ -41,7 +41,7 @@ class DatabasePage(QtWidgets.QSplitter):
         self.setStretchFactor(0, 3)
 
         self.addWidget(self.secondaryWidget)
-        self.setStretchFactor(1, 2)
+        self.setStretchFactor(1, 1)
         self.populate()
 
         self.instance = self
