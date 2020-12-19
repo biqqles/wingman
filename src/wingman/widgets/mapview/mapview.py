@@ -262,5 +262,5 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
             return QtCore.QTextStream(file).readAll()
         raise FileNotFoundError("MapView: couldn't load hook source")
 
-    JS_DEV_PATH = './widgets/mapview/navmap.js'
+    JS_DEV_PATH = os.path.join(os.path.dirname(__file__), 'navmap.js')
     JS_RESOURCE = ':/javascript/navmap.js'
