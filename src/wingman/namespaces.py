@@ -49,11 +49,13 @@ class Configuration(configparser.ConfigParser):
             self.dsace = self.paths['dsace']
             self.launcher_accounts = self.paths['accounts']
 
+            self.migrations()
+
             self.urls = self['urls']
             self.navmap = self['urls']['navmap']
         except (FileNotFoundError, KeyError):
             logging.warning('Config missing or corrupt, reverting to defaults')
-            self.createDefault()
+            self.createFile()
             self.__init__(self.path)
 
     def commit(self, path=None):
@@ -68,16 +70,25 @@ class Configuration(configparser.ConfigParser):
 
     def reset(self):
         """Reset the configuration to the defaults."""
-        self.createDefault()
+        self.createFile()
 
-    def createDefault(self):
-        """Create a new configuration to the defaults."""
-        # load default file from resources
+    def createFile(self):
+        """Create a new configuration file."""
+        self.read_string(self.loadDefaults())
+        self.commit()
+
+    def migrations(self):
+        """Perform any migrations from the current config to an updated version."""
+        defaults = configparser.ConfigParser()
+        defaults.read_string(self.loadDefaults())
+        self['urls'] = defaults['urls']
+
+    @staticmethod
+    def loadDefaults() -> str:
+        """Load the default configuration from resources."""
         file = QtCore.QFile(':/config/default')
         file.open(QtCore.QIODevice.ReadOnly | QtCore.QFile.Text)
-        default = QtCore.QTextStream(file).readAll()
-        self.read_string(default)
-        self.commit()
+        return QtCore.QTextStream(file).readAll()
 
 
 class Icons:
