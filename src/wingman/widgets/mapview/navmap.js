@@ -106,6 +106,12 @@ class Wingman {
         generateUniverseMap();
     }
 
+    drawShip(x, y, z) {
+        // Remove any existing ship markers and draw a new one at the given coordinates.
+        $(".playerShip").remove();
+        new mapObject("playerShip latestPos", x, y, z, 0, 0, 0, 0);
+    }
+
     onDisplayChanged() {
         // Handle the displayed system or solar being changed
         $('.systemTitle').css('font-size', '2em');
