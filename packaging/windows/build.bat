@@ -1,15 +1,16 @@
-:: Prerequisites: Python >=3.7 available with "py", "pyrcc5" (installed with PyQt) and Inno Setup 5
+:: Prerequisites: Python >=3.7 available with "py", "pyrcc5" (installed with PyQt), Nuitka, PyInstaller and Inno Setup 6
 
 :: compile resources
 pyrcc5 "../../src/resources.qrc" -o "../../src/wingman/resources.py"
 
-:: build exe
+:: compile application with Nuitka - currently used in hybrid with PyInstaller
+py -m nuitka --module ../../src/wingman --include-package=wingman
+
+:: build exe with PyInstaller
 py -m PyInstaller windows.spec -y
 
 :: remove unnecessary files
 chdir "./dist/Wingman/"
-rmdir /s /q "wingman/cache"
-rmdir /s /q "wingman/__pycache__"
 rmdir /s /q "PyQt5/Qt/translations"
 rmdir /s /q "PyQt5/Qt/qml"
 del /q Qt5Bluetooth.dll Qt5Location.dll Qt5Nfc.dll Qt5Sensors.dll Qt5Multimedia.dll
