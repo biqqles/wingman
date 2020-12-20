@@ -19,6 +19,8 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file defines a loading indicator that displays the progress
 of flint lazy-loading at application start.
 """
+import logging
+
 from PyQt5 import QtCore, QtWidgets
 import flint as fl
 
@@ -67,3 +69,4 @@ class Indicator:
             self.statusBar.removeWidget(self.bar)
             self.statusBar.clearMessage()
             self.statusBar.hide()
+            logging.info('Game data loaded')

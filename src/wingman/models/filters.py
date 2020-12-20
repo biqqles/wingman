@@ -36,3 +36,7 @@ class TextFilter(QtCore.QSortFilterProxyModel):
     def update(self, query: str):
         """Cause the filter to be updated with a new query."""
         self.setFilterFixedString(query)
+
+    def query(self) -> str:
+        """Return the current query for the filter."""
+        return self.filterRegExp().pattern()

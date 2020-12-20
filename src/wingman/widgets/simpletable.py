@@ -22,6 +22,7 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .. import app, IS_WIN
+from ..models.filters import TextFilter
 
 
 class SimpleTable(QtWidgets.QTableView):
@@ -39,7 +40,8 @@ class SimpleTable(QtWidgets.QTableView):
         # configure model
         self.itemModel = QtGui.QStandardItemModel()
         self.itemModel.setHorizontalHeaderLabels(header)
-        self.setModel(self.itemModel)
+        self.filterModel = TextFilter(self.itemModel)
+        self.setModel(self.filterModel)
 
         # configure view
         self.setSortingEnabled(True)
@@ -113,6 +115,15 @@ class SimpleTable(QtWidgets.QTableView):
             item.setCheckable(True)
             item.setChecked(not self.isColumnHidden(i))
             item.toggled.connect(lambda checked, index=i: self.setColumnHidden(index, not checked))
+
+        rowsMenu = menu.addMenu('Filter rows')
+        rowsEdit = QtWidgets.QLineEdit(self.filterModel.query())
+        rowsEdit.textChanged.connect(self.filterModel.update)
+        rowsEdit.setPlaceholderText('Query')
+        rowsEdit.setClearButtonEnabled(True)
+        rowFilter = QtWidgets.QWidgetAction(rowsMenu)
+        rowFilter.setDefaultWidget(rowsEdit)
+        rowsMenu.addAction(rowFilter)
 
         menu.exec(QtGui.QCursor.pos())
 
