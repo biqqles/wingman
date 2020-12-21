@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
+from functools import partial
+
 from PyQt5 import QtCore, QtWidgets
 import flint as fl
 
@@ -33,6 +35,13 @@ class ExpandedMap(MapView):
         self.setWindowFlags(QtCore.Qt.Window)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
         self.controlsFrame.hide()
+
+        # customise context menu
+        self.menu.clear()
+        showOorp = QtWidgets.QAction('Show inaccessible systems', checkable=True, checked=False)
+        showOorp.toggled.connect(partial(self.setState, 'wingman.showOorp'))
+        self.actions = [showOorp, self.saveAction]
+        self.menu.addActions(self.actions)
 
     def heightForWidth(self, width: int) -> int:
         """Should always be square."""

@@ -70,16 +70,19 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         self.controlsFrame.lower()
 
         # create context menu
+        # TODO it would be nice if QMenu.addAction had an overload including checkable and checked...
         self.menu = QtWidgets.QMenu()
-        self.showLabels = QtWidgets.QAction('Show labels', checkable=True, checked=True)
-        self.showLabels.toggled.connect(partial(self.setState, 'wingman.showLabels'))
-        self.showZones = QtWidgets.QAction('Show nebulae', checkable=True, checked=True)
-        self.showZones.toggled.connect(partial(self.setState, 'wingman.showZones'))
-        self.showWrecks = QtWidgets.QAction('Show wrecks', checkable=True, checked=True)
-        self.showWrecks.toggled.connect(partial(self.setState, 'wingman.showWrecks'))
+        showLabels = QtWidgets.QAction('Show labels', checkable=True, checked=True)
+        showLabels.toggled.connect(partial(self.setState, 'wingman.showLabels'))
+        showZones = QtWidgets.QAction('Show nebulae', checkable=True, checked=True)
+        showZones.toggled.connect(partial(self.setState, 'wingman.showZones'))
+        showWrecks = QtWidgets.QAction('Show wrecks', checkable=True, checked=True)
+        showWrecks.toggled.connect(partial(self.setState, 'wingman.showWrecks'))
+        self.saveAction = QtWidgets.QAction('Save map as image')  # should be available to subclasses
+        self.saveAction.triggered.connect(self.saveAsImage)
 
-        self.menu.addActions([self.showLabels, self.showWrecks, self.showZones])
-        self.menu.addAction('Save map as image').triggered.connect(self.saveAsImage)
+        self.actions = [showLabels, showWrecks, showZones, self.saveAction]
+        self.menu.addActions(self.actions)
 
         # configure settings
         self.settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.SpatialNavigationEnabled, True)
