@@ -28,6 +28,7 @@ class TextFilter(QtCore.QSortFilterProxyModel):
         self.setDynamicSortFilter(True)
         self.setRecursiveFilteringEnabled(True)
         self.setFilterKeyColumn(-1)  # filter on all columns
+        self.setSortRole(QtCore.Qt.UserRole)
 
         # delegate QStandardItemModel methods
         self.invisibleRootItem = sourceModel.invisibleRootItem
