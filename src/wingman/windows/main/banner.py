@@ -18,7 +18,10 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file defines the interface of the application's main window.
 """
+import atexit
+
 from PyQt5 import QtCore, QtWidgets
+
 from ... import IS_WIN
 if IS_WIN:
     import flair
@@ -37,6 +40,7 @@ class FlairBanner(QtWidgets.QLabel):
             self.timer.setInterval(self.UPDATE_INTERVAL)
             self.timer.timeout.connect(self.updateContents)
             self.timer.start()
+            atexit.register(self.timer.stop)
 
         self.updateContents()
         self.updatePosition()
