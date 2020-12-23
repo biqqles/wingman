@@ -194,7 +194,7 @@ class EquipmentPage(DatabasePage):
                 GenericItem(equipment.ids_name),
                 GenericItem(equipment.ids_info)
             ]
-            for equipment in fl.equipment.of_type(self.equipmentType) if equipment.good()
+            for equipment in fl.equipment.of_type(self.equipmentType) if equipment.is_valid()
         ])
 
     def onSelectedRowChanged(self, selectedItems):
@@ -214,6 +214,11 @@ class GunsPage(EquipmentPage):
                          'Dispersion (°)', 'Hull dmg', 'Shield dmg', 'Hull dps', 'Shield dps', 'Energy/s', 'Efficiency',
                          'Technology', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Gun
+
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and not (gun.is_turret() or gun.is_missile())
 
     def populate(self):
         self.mainTable.populate([
@@ -237,8 +242,24 @@ class GunsPage(EquipmentPage):
                 GenericItem(gun.ids_name),
                 GenericItem(gun.ids_info)
             ]
-            for gun in fl.equipment.of_type(self.equipmentType) if gun.good() and gun.munition()
+            for gun in fl.equipment.of_type(self.equipmentType) if self.gunDiscriminator(gun)
         ])
+
+
+class TurretsPage(GunsPage):
+    """Database page displaying turrets."""
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and gun.is_turret()
+
+
+class MissilesPage(EquipmentPage):
+    """Database page displaying missiles."""
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and gun.is_missile()
 
 
 class ThrustersPage(EquipmentPage):
@@ -258,7 +279,7 @@ class ThrustersPage(EquipmentPage):
                 GenericItem(thruster.ids_name),
                 GenericItem(thruster.ids_info),
             ]
-            for thruster in fl.equipment.of_type(self.equipmentType) if thruster.good()
+            for thruster in fl.equipment.of_type(self.equipmentType) if thruster.is_valid()
         ])
 
 
@@ -275,7 +296,7 @@ class IDsPage(EquipmentPage):
                 GenericItem(tractor.ids_name),
                 GenericItem(tractor.ids_info),
             ]
-            for tractor in fl.equipment.of_type(self.equipmentType) if tractor.good()
+            for tractor in fl.equipment.of_type(self.equipmentType) if tractor.is_valid()
         ])
 
 
@@ -295,7 +316,7 @@ class ArmourPage(EquipmentPage):
                 GenericItem(armour.ids_name),
                 GenericItem(armour.ids_info),
             ]
-            for armour in fl.equipment.of_type(self.equipmentType) if armour.good()
+            for armour in fl.equipment.of_type(self.equipmentType) if armour.is_valid()
         ])
 
 

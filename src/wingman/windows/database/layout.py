@@ -91,4 +91,6 @@ HEADINGS = {
     'Shields': ShieldsPage,
     'Cloaks': CloaksPage,
     'Engines': EnginesPage,
+    'Missiles': MissilesPage,
+    'Turrets': TurretsPage,
 }
