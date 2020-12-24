@@ -40,7 +40,7 @@ The application will probably be installable on macOS using the above commands b
 
 #### Native styling
 Because the PyQt wheels do not include platform-specific style plugins, Wingman will run with the default Fusion theme when using pip-installed PyQt5. This works OK, but if you prefer native theming (e.g. Breeze on a KDE system) you need to install the PyQt5 packages from your distro's package manager rather than pip. Unless you want to build PyQt from source, **this is only possible if your distro provides a PyQt5 package for Python 3.7 or higher**. This rules out Ubuntu LTS, as at the time of writing packages are built only for Python 3.6.
-many
+
 - Uninstall the `PyQt5` and `PyQtWebEngine` packages with pip
 - Install `python-pyqt5` and `python-pyqtwebengine` (e.g. if you use pacman) or `python3-pyqt5` and `python3-pyqt5.qtwebengine` (if you use apt) with your package manager
 
@@ -57,6 +57,6 @@ From the root directory, `cd packaging/windows`. Ensure that [PyInstaller](https
 Now run `build.bat` to build a one folder application and an installer.
 
 ### For Linux
-Again from the root directory, run `python setup.py sdist` to build a source distribution.
+From the root directory, `cd packaging/linux` and run `build.sh` to build a source distribution.
 
 To now install your locally-built distribution, run `pip install dist/wingman-*.tar.gz`.
