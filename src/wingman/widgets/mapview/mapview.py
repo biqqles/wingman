@@ -148,7 +148,7 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
     def emitDisplayChanged(self, newNickname: str):
         """Emit displayChanged if required."""
         try:
-            if newNickname != 'Sirius':
+            if newNickname and newNickname != 'Sirius':
                 self.displayChanged.emit(newNickname)
         except RuntimeError:  # thrown if process is killed
             return
