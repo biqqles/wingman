@@ -60,9 +60,14 @@ class Database(QtWidgets.QDialog):
         """Display the page with the given name."""
         app.setOverrideCursor(QtCore.Qt.WaitCursor)
 
-        if HEADINGS[name] not in self.pagesCache:
-            self.pagesCache[HEADINGS[name]] = HEADINGS[name](self)
-        newPage = self.pagesCache[HEADINGS[name]]
+        try:
+            if HEADINGS[name] not in self.pagesCache:
+                self.pagesCache[HEADINGS[name]] = HEADINGS[name](self)
+            newPage = self.pagesCache[HEADINGS[name]]
+        except:
+            raise
+        finally:
+            app.restoreOverrideCursor()
 
         if self.currentPage:  # replace or insert the page
             self.currentPage.hide()
@@ -73,8 +78,6 @@ class Database(QtWidgets.QDialog):
 
         self.currentPage = newPage
         self.currentPage.show()
-
-        app.restoreOverrideCursor()
 
 
 HEADINGS = {
