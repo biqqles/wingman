@@ -473,7 +473,7 @@ class FactionsPage(DatabasePage):
         self.sheetTable.populate([
             [
                 FactionItem(other_faction),
-                NumberItem(rep_towards),
+                RepItem(rep_towards),
             ] for other_faction, rep_towards in faction.rep_sheet().items()
         ])
         self.sheetTable.sortByColumn(1, QtCore.Qt.DescendingOrder)  # sort by "reputation with" column

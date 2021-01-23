@@ -202,27 +202,8 @@ class ProfitItem(CreditsItem):
         return self.getData().profit() < other.getData().profit()
 
 
-class AccountItem(GenericItem):
-    @dataclass
-    class Account:
-        hash: str
-        launcher_name: str
-        launcher_description: str
-
-    def __init__(self, account: Account):
-        super().__init__(account)
-        self.setFont(fontBold)
-        self.setDropEnabled(True)
-
-    @staticmethod
-    def represent(account: Account) -> str:
-        return account.launcher_name
-
-    def serialise(self) -> Any:
-        return self.getData().hash
-
-
 class DateItem(NumberItem):
+    """An item representing a date."""
     timer = QtCore.QTimer()
     timer.start(60_000)
 
@@ -265,3 +246,40 @@ class DateItem(NumberItem):
                 self.putData(QtCore.QDateTime(date))
         else:
             super().setData(date, role)
+
+
+class RepItem(NumberItem):
+    """An item representing a faction reputation (aka empathy)."""
+    BARS_FILLED = tuple(['█'] * 11)
+    BARS_UNFILLED = tuple(['▁'] * 10)
+
+    def represent(self, number: float) -> str:
+        """Represent this reputation as a coloured (TODO) bar, similar to that seen in-game."""
+        filled_bars = int(abs(number) * 10) + 1
+        left = list(self.BARS_UNFILLED)
+        right = [*self.BARS_FILLED[:filled_bars], *self.BARS_UNFILLED[filled_bars - 1:]]
+        bars = left + right
+        if number < 0:  # for negative reps, simply reverse the bar
+            bars = bars[::-1]
+        return ' '.join([*bars, '  ', super().represent(number)])
+
+
+class AccountItem(GenericItem):
+    """An item representing a launcher account."""
+    @dataclass
+    class Account:
+        hash: str
+        launcher_name: str
+        launcher_description: str
+
+    def __init__(self, account: Account):
+        super().__init__(account)
+        self.setFont(fontBold)
+        self.setDropEnabled(True)
+
+    @staticmethod
+    def represent(account: Account) -> str:
+        return account.launcher_name
+
+    def serialise(self) -> Any:
+        return self.getData().hash
