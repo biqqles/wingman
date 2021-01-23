@@ -53,5 +53,10 @@ setup(
     data_files=[
         ('share/applications', ['packaging/linux/eu.biqqles.wingman.desktop']),
         ('share/icons/hicolor/256x256/apps', ['icons/general/wingman.png']),
+        # create file stubs for deletion of the real things upon uninstallation.
+        # sadly there is no way to delete folders...
+        # also, these paths are only valid for non-sudo installs
+        ('share/wingman', ['wingman.cfg']),
+        ('share/wingman', ['wingman.log']),
     ],
 )
