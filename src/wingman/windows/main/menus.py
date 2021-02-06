@@ -35,21 +35,38 @@ if IS_WIN:
     from flair.augment import cli, clipboard, screenshot
 
 
+# noinspection PyMissingOrEmptyDocstring
 class SimpleAction(QAction):
-    """A simplified QAction abstraction."""
-    def __init__(self, title: str, run: Callable = lambda: None, shortcut: str = '', tooltip='',
-                 enabled=True, checkable=False):
-        super().__init__(title)
-        if shortcut:
-            self.setShortcut(shortcut)
-        if tooltip:
-            self.setToolTip(tooltip)
-        if checkable:
-            self.toggled.connect(run)
-        else:
-            self.triggered.connect(run)
-        self.setEnabled(enabled)
-        self.setCheckable(checkable)
+    """A declarative QAction abstraction."""
+    def onTrigger(self, callback: Callable):
+        self.triggered.connect(callback)
+        return self
+
+    def onToggle(self, callback: Callable):
+        self.toggled.connect(callback)
+        return self
+
+    def withShortcut(self, shortcut: str):
+        self.setShortcut(shortcut)
+        return self
+
+    def withTooltip(self, tooltip: str):
+        self.setToolTip(tooltip)
+        return self
+
+    def checkable(self):
+        self.setCheckable(True)
+        return self
+
+    def disableIf(self, condition: bool):
+        self.setDisabled(condition)
+        return self
+
+    def withConfig(self, section: str, key: str):
+        if bool(config[section][key]):
+            self.toggle()
+        self.toggled.connect(lambda state: config[section].update({key: str(state)}))
+        return self
 
 
 class Separator(QAction):
@@ -66,7 +83,7 @@ class SimpleMenu(QMenu):
     actions_: List[SimpleAction]
     tooltip = ''
 
-    def __init__(self, menuBar: QMenuBar):
+    def __init__(self, menuBar: QMenuBar = None):
         super().__init__(self.title, menuBar)
         self.setToolTipsVisible(True)
         for menu in self.submenus:
@@ -95,7 +112,9 @@ class Utilities(SimpleMenu):
     """'Utilities' menu."""
     title = '&Utilities'
     actions_ = [
-        SimpleAction('&Database', lambda: Database().exec(), tooltip=Database.tooltip),
+        SimpleAction('&Database')
+            .withTooltip(Database.tooltip)
+            .onTrigger(lambda: Database().exec()),
     ]
 
 
@@ -107,27 +126,46 @@ class File(SimpleMenu):
         """'Open in browser' submenu."""
         title = 'Open in browser'
         actions_ = [
-            SimpleAction('Server &rules', lambda: openUrl(config.urls['rules'])),
-            SimpleAction('House &laws', lambda: openUrl(config.urls['houselaws'])),
-            SimpleAction('&Player status', lambda: openUrl(config.urls['playerstatus'])),
-            SimpleAction('Online &navmap', lambda: openUrl(config.urls['navmap'])),
-            SimpleAction('&Wiki', lambda: openUrl(config.urls['wiki'])),
-            SimpleAction('&Forums', lambda: openUrl(config.urls['forums'])),
+            SimpleAction('Server &rules')
+                .onTrigger(lambda: openUrl(config.urls['rules'])),
+
+            SimpleAction('House &laws')
+                .onTrigger(lambda: openUrl(config.urls['houselaws'])),
+
+            SimpleAction('&Player status')
+                .onTrigger(lambda: openUrl(config.urls['playerstatus'])),
+
+            SimpleAction('Online &navmap')
+                .onTrigger(lambda: openUrl(config.urls['navmap'])),
+
+            SimpleAction('&Wiki')
+                .onTrigger(lambda: openUrl(config.urls['wiki'])),
+
+            SimpleAction('&Forums')
+                .onTrigger(lambda: openUrl(config.urls['forums'])),
         ]
 
     actions_ = [
-        SimpleAction('&Start launcher', startLauncher, shortcut='Ctrl+L', enabled=IS_WIN),
-        SimpleAction('Open DSAce.log', lambda: openFile(config.dsace)),
-        SimpleAction('Open Freelancer directory', lambda: openFile(config.install)),
+        SimpleAction('&Start launcher')
+            .withShortcut('Ctrl+L')
+            .disableIf(not IS_WIN)
+            .onTrigger(startLauncher),
+
+        SimpleAction('Open DSAce.log')
+            .onTrigger(lambda: openFile(config.dsace)),
+
+        SimpleAction('Open Freelancer directory')
+            .onTrigger(lambda: openFile(config.install)),
+
         Separator(),
-        SimpleAction('Reload game files', shortcut='Ctrl+R'),  # todo: run
+
+        SimpleAction('Reload game files')  # todo: run
+            .withShortcut('Ctrl+R'),
     ]
 
-    def __init__(self, menuBar: QMenuBar):
-        self.submenus = [
-            self.Browser(menuBar),
-        ]
-        super().__init__(menuBar)
+    submenus = [
+        Browser()
+    ]
 
 
 class Freelancer(SimpleMenu):
@@ -139,25 +177,32 @@ class Freelancer(SimpleMenu):
         """'Augmentations' submenu."""
         title = 'Toggle client augmentations'
         actions_ = [
-            SimpleAction('Clipboard', lambda c: Freelancer.toggleAugmentation(clipboard.Clipboard, c),
-                         checkable=True,
-                         tooltip='Adds clipboard functionality to the chat box. '
-                                 'Use Ctrl+Shift+C to copy and Ctrl+Shift+V to paste'
-                         ),
-            SimpleAction('Named screenshots', lambda c: Freelancer.toggleAugmentation(screenshot.Screenshot, c),
-                         checkable=True,
-                         tooltip="Use Ctrl+PrintScreen to take a screenshot named using the current time and"
-                                 " character's name and location.\nScreenshots are saved to"
-                                 " Documents/My Games/Freelancer/Screenshots"
-                         ),
-            SimpleAction('Command line interface', lambda c: Freelancer.toggleAugmentation(cli.CLI, c),
-                         checkable=True,
-                         tooltip='Adds new commands to the chat box. Send "..help" to get started'
-                         ),
+            SimpleAction('Clipboard')
+                .checkable()
+                .withTooltip('Adds clipboard functionality to the chat box. '
+                             'Use Ctrl+Shift+C to copy and Ctrl+Shift+V to paste')
+                .withConfig('flair', 'clipboard')
+                .onTrigger(lambda c: Freelancer.toggleAugmentation(clipboard.Clipboard, c)),
+
+            SimpleAction('Named screenshots')
+                .checkable()
+                .withTooltip("Use Ctrl+PrintScreen to take a screenshot named using the current time and"
+                             " character's name and location.\nScreenshots are saved to"
+                             " Documents/My Games/Freelancer/Screenshots")
+                .withConfig('flair', 'screenshot')
+                .onTrigger(lambda c: Freelancer.toggleAugmentation(screenshot.Screenshot, c)),
+
+            SimpleAction('Command line interface')
+                .checkable()
+                .withTooltip('Adds new commands to the chat box. Send "..help" to get started')
+                .withConfig('flair', 'cli')
+                .onTrigger(lambda c: Freelancer.toggleAugmentation(cli.CLI, c)),
         ]
 
     actions_ = [
-        SimpleAction('Bring to foreground', shortcut='Ctrl+F', enabled=IS_WIN)
+        SimpleAction('Bring to foreground')
+            .withShortcut('Ctrl+F')
+            .disableIf(not IS_WIN)
     ]
 
     def __init__(self, menuBar):
@@ -170,21 +215,12 @@ class Freelancer(SimpleMenu):
             flair.events.freelancer_started.connect(lambda: self.actions_[0].setEnabled(True))
             flair.events.freelancer_stopped.connect(lambda: self.actions_[0].setEnabled(False))
             self.actions_[0].triggered.connect(flair.hook.window.make_foreground)
-
-            if config['flair'].getboolean('clipboard'):
-                self.submenus[0].actions_[0].toggle()
-            if config['flair'].getboolean('screenshot'):
-                self.submenus[0].actions_[1].toggle()
-            if config['flair'].getboolean('cli'):
-                self.submenus[0].actions_[2].toggle()
         else:
             self.submenus[0].setEnabled(False)
-            self.actions_[0].setEnabled(False)
 
     @classmethod
     def toggleAugmentation(cls,  augmentation: Type['flair.augment.Augmentation'], toggled: bool):
         cls.loadAugmentation(augmentation) if toggled else cls.unloadAugmentation(augmentation)
-        config['flair'][augmentation.__name__.lower()] = str(toggled)
 
     @classmethod
     def loadAugmentation(cls, augmentation: Type['flair.augment.Augmentation']):
@@ -203,9 +239,12 @@ class Preferences(SimpleMenu):
     title = '&Preferences'
 
     actions_ = [
-        SimpleAction('Configure paths', lambda: configuration.ConfigurePaths().exec()),
-        SimpleAction('Export preferences', lambda: Preferences.exportPreferences()),
-        SimpleAction('Reset to defaults', config.reset),
+        SimpleAction('Configure paths')
+            .onTrigger(lambda: configuration.ConfigurePaths().exec()),
+        SimpleAction('Export preferences')
+            .onTrigger(lambda: Preferences.exportPreferences()),
+        SimpleAction('Reset to defaults')
+            .onTrigger(config.reset),
     ]
 
     @staticmethod
@@ -223,7 +262,10 @@ class Help(SimpleMenu):
     title = '&Help'
 
     actions_ = [
-        SimpleAction('Visit project thread', lambda: openUrl(config.urls['projectthread'])),
-        SimpleAction('Visit project repo', lambda: openUrl(config.urls['repo'])),
-        SimpleAction('About', lambda: about.About().exec()),
+        SimpleAction('Visit project thread')
+            .onTrigger(lambda: openUrl(config.urls['projectthread'])),
+        SimpleAction('Visit project repo')
+            .onTrigger(lambda: openUrl(config.urls['repo'])),
+        SimpleAction('About')
+            .onTrigger(lambda: about.About().exec()),
     ]
