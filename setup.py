@@ -10,7 +10,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name='wingman',
-    version='0.3',
+    version='0.4',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
