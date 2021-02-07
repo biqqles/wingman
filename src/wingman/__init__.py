@@ -90,12 +90,7 @@ icons = namespaces.Icons()
 config = namespaces.Configuration(CONFIG_FILE)
 
 # platform specific initialisation
-if IS_WIN:
-    font = app.font()
-    font.setFamily('Segoe UI')
-    font.setPointSizeF(font.pointSize() * 1.2)
-    app.setFont(font)
-else:
+if not IS_WIN:
     if QtWidgets.QStyleFactory.keys() == ['Windows', 'Fusion']:
         logging.warning("Native Qt style not available. Defaulting to Fusion - the application may not render "
                         "correctly. To fix this, install the PyQt5 packages from your distro's repos, not pip.")
