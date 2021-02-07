@@ -39,3 +39,10 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: runascurrentuser nowait postinstall skipifsilent
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{localappdata}\wingman\navmap"
+Type: filesandordirs; Name: "{localappdata}\wingman\QtWebEngine"
+Type: files; Name: "{localappdata}\wingman\debug.log"
+Type: files; Name: "{localappdata}\wingman\wingman.cfg"
+Type: files; Name: "{localappdata}\wingman\wingman.log"
