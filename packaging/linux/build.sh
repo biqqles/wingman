@@ -4,7 +4,7 @@
 cd ../..
 
 # clean up from previous builds
-python setup.py clean
+python3 setup.py clean
 rm dist/*
 
 # ensure resources are up to date
@@ -17,7 +17,7 @@ touch wingman.log
 
 # actually build the distribution. Building a wheel breaks several options in
 # setup.py which is why sdist is used
-python setup.py sdist
+python3 setup.py sdist
 
 # delete dummy files
 rm -r wingman.cfg wingman.log
