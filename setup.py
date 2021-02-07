@@ -36,13 +36,13 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy>=0.6.1',
-        'fl-flint>=0.7.1',
+        'dataclassy>=0.7.1',
+        'fl-flint>=0.8',
         'fl-flair>=0.4.1; platform_system=="Windows"',
-        'ago',
-        'Pillow',
-        'PyQt5',
-        'PyQtWebEngine',
+        'ago==0.0.93',
+        'Pillow==8.1.0',
+        'PyQt5==5.15.2',
+        'PyQtWebEngine==5.15.2',
     ],
 
     entry_points={
