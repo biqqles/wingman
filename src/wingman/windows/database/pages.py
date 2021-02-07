@@ -247,7 +247,6 @@ class GunsPage(EquipmentPage):
 
 
 class TurretsPage(GunsPage):
-    """Database page displaying turrets."""
     @staticmethod
     def gunDiscriminator(gun: fl.entities.Gun) -> bool:
         """Determine what type of gun this is."""
@@ -256,10 +255,38 @@ class TurretsPage(GunsPage):
 
 class MissilesPage(EquipmentPage):
     """Database page displaying missiles."""
+    mainTableHeadings = ['Name', 'Price', 'Hardpoint', 'Energy/shot', 'Seeking', 'CD', 'Refire', 'Hull dmg',
+                         'Shield dmg', 'Range (m)', 'Muzzle velocity (ms⁻¹)', 'Acceleration (ms⁻²)', 'Motor delay (s)',
+                         'Nickname', 'Name ID', 'Info ID']
+    equipmentType = fl.entities.Gun
+
     @staticmethod
     def gunDiscriminator(gun: fl.entities.Gun) -> bool:
         """Determine what type of gun this is."""
         return gun.is_valid() and gun.is_missile()
+
+    def populate(self):
+        self.mainTable.populate([
+            [
+                EntityItem(missile),
+                CreditsItem(missile.price()),
+                MonospaceItem(missile.hp_gun_type),
+                NumberItem(missile.power_usage),
+                BooleanItem(missile.munition().seeker == 'lock'),
+                BooleanItem(missile.munition().cruise_disruptor or False),
+                NumberItem(missile.refire()),
+                NumberItem(missile.hull_damage()),
+                NumberItem(missile.shield_damage()),
+                NumberItem(missile.range()),
+                NumberItem(missile.muzzle_velocity),
+                NumberItem(missile.munition().motor_().accel if missile.munition().motor_() else 0),
+                NumberItem(missile.munition().motor_().delay if missile.munition().motor_() else 0),
+                MonospaceItem(missile.nickname),
+                GenericItem(missile.ids_name),
+                GenericItem(missile.ids_info)
+            ]
+            for missile in fl.equipment.of_type(self.equipmentType) if self.gunDiscriminator(missile)
+        ])
 
 
 class ThrustersPage(EquipmentPage):
@@ -349,7 +376,7 @@ class CountermeasuresPage(EquipmentPage):
 class MinesPage(EquipmentPage):
     """Database page displaying mine droppers."""
     mainTableHeadings = ['Name', 'Dropper price', 'Ammo price', 'Max ammo', 'Refire', 'Hull dmg', 'Shield dmg',
-                         'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (m/s⁻²)',
+                         'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (ms⁻²)',
                          'Lifetime', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.MineDropper
 
