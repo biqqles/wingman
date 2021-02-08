@@ -4,10 +4,11 @@
 pyrcc5 "../../src/resources.qrc" -o "../../src/wingman/resources.py"
 
 :: compile application with Nuitka - currently used in hybrid with PyInstaller
-py -m nuitka --module ../../src/wingman --include-package=wingman
+del wingman*
+python -m nuitka --module ../../src/wingman --include-package=wingman
 
 :: build exe with PyInstaller
-py -m PyInstaller windows.spec -y
+python -m PyInstaller windows.spec -y
 
 :: remove unnecessary files
 chdir "./dist/Wingman/"
