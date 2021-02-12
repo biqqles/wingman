@@ -63,9 +63,9 @@ class SimpleAction(QAction):
         return self
 
     def withConfig(self, section: str, key: str):
-        if bool(config[section][key]):
-            self.toggle()
-        self.toggled.connect(lambda state: config[section].update({key: str(state)}))
+        self.triggered.connect(lambda state: config[section].update({key: str(state)}))
+        if config[section].getboolean(key):
+            self.trigger()
         return self
 
 
@@ -181,7 +181,6 @@ class Freelancer(SimpleMenu):
                 .checkable()
                 .withTooltip('Adds clipboard functionality to the chat box. '
                              'Use Ctrl+Shift+C to copy and Ctrl+Shift+V to paste')
-                .withConfig('flair', 'clipboard')
                 .onTrigger(lambda c: Freelancer.toggleAugmentation(clipboard.Clipboard, c)),
 
             SimpleAction('Named screenshots')
@@ -189,15 +188,19 @@ class Freelancer(SimpleMenu):
                 .withTooltip("Use Ctrl+PrintScreen to take a screenshot named using the current time and"
                              " character's name and location.\nScreenshots are saved to"
                              " Documents/My Games/Freelancer/Screenshots")
-                .withConfig('flair', 'screenshot')
                 .onTrigger(lambda c: Freelancer.toggleAugmentation(screenshot.Screenshot, c)),
 
             SimpleAction('Command line interface')
                 .checkable()
                 .withTooltip('Adds new commands to the chat box. Send "..help" to get started')
-                .withConfig('flair', 'cli')
-                .onTrigger(lambda c: Freelancer.toggleAugmentation(cli.CLI, c)),
+                .onTrigger(lambda c: Freelancer.toggleAugmentation(cli.CLI, c))
         ]
+
+        def __init__(self, menuBar):
+            super().__init__(menuBar)  # todo: this is ugly but required for delayed loading of augmentations
+            self.actions_[0].withConfig('flair', 'clipboard')
+            self.actions_[1].withConfig('flair', 'screenshot')
+            self.actions_[2].withConfig('flair', 'cli')
 
     actions_ = [
         SimpleAction('Bring to foreground')
