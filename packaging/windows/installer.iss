@@ -1,5 +1,5 @@
 #define MyAppName "Wingman"
-#define MyAppVersion "0.4"
+#define MyAppVersion "0.4.1"
 #define MyAppPublisher "biqqles"
 #define MyAppURL "https://github.com/biqqles/wingman"
 #define MyAppExeName "Wingman.exe"
