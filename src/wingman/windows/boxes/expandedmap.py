@@ -64,13 +64,14 @@ class ExpandedMap(MapView):
         self.displayChanged.connect(lambda: self.setWindowTitle(self.getDisplayed()))
         self.display()
 
-    def displayUniverse(self):
+    def displayUniverse(self, highlightedSystem=None):
         """Display an expanded universe map."""
         super().displayUniverse()
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.resize(*self.INITIAL_SIZE)
         self.setWindowTitle('Sirius')
         self.show()
+        self.page().runJavaScript(f'wingman.highlightSystem({highlightedSystem!r})')
         try:
             self.displayChanged.disconnect()
         except TypeError:  # raised when no callbacks are connected

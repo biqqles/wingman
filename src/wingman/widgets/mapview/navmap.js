@@ -106,6 +106,22 @@ class Wingman {
         generateUniverseMap();
     }
 
+    highlightSystem(systemNickname) {
+        // Highlight a system on the universe map.
+        // Right now this is only used to show the current navmap system in the universe map.
+        // In the future it will be used to display the start and destination for route planning.
+
+        $('.system').children().css({  // todo: hacky workaround for weird need to reset
+            'color': 'white',
+            'font-weight': 'normal',
+        });
+
+        $(`[data-system-nickname='${systemNickname}']`).children().css({
+            'color': 'gold',
+            'font-weight': 'bold',
+        });
+    }
+
     drawShip(x, y, z) {
         // Remove any existing ship markers and draw a new one at the given coordinates.
         $(".playerShip").remove();

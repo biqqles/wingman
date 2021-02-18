@@ -18,6 +18,8 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file defines the behaviour of the Navmap tab.
 """
+from typing import Union
+
 from PyQt5 import QtCore, QtWidgets
 import flint as fl
 
@@ -123,7 +125,7 @@ class Navmap:
 
     def displayUniverseMap(self):
         """Display an expanded universe map. Selecting a system will display it in the main navmap."""
-        self.expandedMap.displayUniverse()
+        self.expandedMap.displayUniverse(highlightedSystem=self.currentSystem.nickname)
         self.expandedMap.displayChanged.connect(lambda n: self.mapView.displayEntity(fl.systems[n]))
         self.widget.gotoRadioButton.setChecked(True)
 
@@ -132,3 +134,11 @@ class Navmap:
         self.mapView.displayEntity(entity)
         self.tabWidget.setCurrentWidget(self.widget)
         self.widget.activateWindow()
+
+    @property
+    def currentSystem(self) -> fl.entities.System:
+        """The system currently being viewed."""
+        if isinstance(self.currentlyDisplayed, fl.entities.System):
+            return self.currentlyDisplayed
+        else:
+            return self.currentlyDisplayed.system()
