@@ -50,7 +50,6 @@ class ExpandedMap(MapView):
     def display(self):
         """Display an expanded map."""
         self.resize(*self.INITIAL_SIZE)
-        self.moveToCentre()
         self.show()
 
     def displayEntity(self, entity: fl.entities.Entity):
@@ -77,12 +76,3 @@ class ExpandedMap(MapView):
         except TypeError:  # raised when no callbacks are connected
             pass
         self.displayChanged.connect(self.hide)
-
-    def moveToCentre(self):
-        """Move the widget to the centre of the currently active display."""
-        geom = self.frameGeometry()
-        desktop = QtWidgets.QApplication.desktop()
-        activeDisplay = desktop.screenNumber(desktop.cursor().pos())
-        centre = desktop.screenGeometry(activeDisplay).center()
-        geom.moveCenter(centre)
-        self.move(geom.topLeft())
