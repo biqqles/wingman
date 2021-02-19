@@ -187,7 +187,7 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
     def saveAsImage(self):
         """Show a dialogue allowing the user to save the currently displayed map as a PNG image."""
-        defaultPath = os.path.expanduser('~/{}.png').format(self.getDisplayed())
+        defaultPath = os.path.expanduser('~/Pictures/{}.png').format(self.getDisplayed())
         path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                      'Save map as image',
                                                      defaultPath,
