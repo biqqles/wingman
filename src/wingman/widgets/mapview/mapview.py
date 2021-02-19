@@ -57,18 +57,17 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         controlsLayout = QtWidgets.QVBoxLayout(self.controlsFrame)
         controlsLayout.setContentsMargins(0, 0, 0, 0)
         controlsLayout.setSpacing(5)
-        self.connInfoB = SquareButton(icon=icons.jump, tooltip='Connected systems')
-        controlsLayout.addWidget(self.connInfoB)
-        self.forwardB = SquareButton(icon=icons.right, tooltip='Forward')
-        self.forwardB.clicked.connect(self.goForward)
-        controlsLayout.addWidget(self.forwardB)
-        self.backB = SquareButton(icon=icons.left, tooltip='Back')
-        self.backB.clicked.connect(self.goBack)
-        controlsLayout.addWidget(self.backB)
-        self.expandB = SquareButton(icon=icons.expand, tooltip='Show expanded map')
-        controlsLayout.addWidget(self.expandB)
+        self.connInfoButton = SquareButton(icon=icons.jump, tooltip='Connected systems')
+        controlsLayout.addWidget(self.connInfoButton)
+        self.forwardButton = SquareButton(icon=icons.right, tooltip='Forward')
+        self.forwardButton.clicked.connect(self.goForward)
+        controlsLayout.addWidget(self.forwardButton)
+        self.backButton = SquareButton(icon=icons.left, tooltip='Back')
+        self.backButton.clicked.connect(self.goBack)
+        controlsLayout.addWidget(self.backButton)
+        self.expandButton = SquareButton(icon=icons.expand, tooltip='Show expanded map')
+        controlsLayout.addWidget(self.expandButton)
         self.controlsFrame.setLayout(controlsLayout)
-        self.controlsFrame.show()
         self.controlsFrame.lower()
 
         # create context menu
@@ -113,8 +112,8 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
             if not self.backStack or self.getDisplayed() != self.backStack[-1]:
                 self.backStack.append(self.getDisplayed())
 
-        self.backB.setEnabled(bool(len(self.backStack) - 1))
-        self.forwardB.setEnabled(bool(self.forwardsStack))
+        self.backButton.setEnabled(bool(len(self.backStack) - 1))
+        self.forwardButton.setEnabled(bool(self.forwardsStack))
 
         # get the nickname of the currently displayed entity and emit displayChanged
         self.page().runJavaScript('currentSystemNickname', self.emitDisplayChanged)
@@ -183,7 +182,7 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
             action = menu.addAction(f'{system.name()} ({", ".join(j.type() for j in jumps)})')
             action.setToolTip('\n'.join(f'{j.type()}: [{j.sector()}]' for j in jumps))
             action.triggered.connect(lambda _, system=system: self.displayEntity(system))
-        self.connInfoB.setMenu(menu)
+        self.connInfoButton.setMenu(menu)
 
     def saveAsImage(self):
         """Show a dialogue allowing the user to save the currently displayed map as a PNG image."""
