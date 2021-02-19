@@ -53,15 +53,14 @@ class Navmap:
 
         # connections
         self.mapView.displayChanged.connect(self.onURLChange)
-        self.mapView.displayChanged.connect(print)
         self.widget.searchEdit.textEdited.connect(self.onSearchTextEdited)
         # textEdited is only emitted on user input, but completer counts as programmatic
         completer.activated.connect(self.onSearchTextEdited)
         completer.highlighted.connect(self.onSearchTextEdited)
         # navmap buttons
-        self.mapView.backB.clicked.connect(self.widget.gotoRadioButton.click)
-        self.mapView.forwardB.clicked.connect(self.widget.gotoRadioButton.click)
-        self.mapView.expandB.clicked.connect(self.displayExpandedMap)
+        self.mapView.backButton.clicked.connect(self.widget.gotoRadioButton.click)
+        self.mapView.forwardButton.clicked.connect(self.widget.gotoRadioButton.click)
+        self.mapView.expandButton.clicked.connect(self.displayExpandedMap)
         self.widget.universeButton.clicked.connect(self.displayUniverseMap)
 
         self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentlyDisplayed.name()))
