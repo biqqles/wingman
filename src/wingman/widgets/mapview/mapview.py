@@ -16,9 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Dict
 from collections import defaultdict
-import os
 from functools import partial
+import os
+from urllib import parse
 
 from PyQt5 import QtWebEngineWidgets, QtCore, QtWidgets, QtGui
 import flint as fl
@@ -129,19 +131,28 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         """Display universe map."""
         self.page().runJavaScript("wingman.displayUniverseMap()")
 
-    def getDisplayed(self):
+    def getDisplayed(self) -> str:
         """Parse URL to resolve selected object (system/base/planet) name, or 'Sirius' if the universe map is
         displayed. """
-        fragment = self.url().fragment().split('&')[0]
-        return fragment.replace('%20', ' ')[2:].title().replace('%27', "'") if fragment else 'Sirius'
+        fragment = self.getFragment()
+        return fragment.get('q', 'Sirius')
 
-    def setDisplayed(self, entityName):
+    def setDisplayed(self, entityName: str):
         """Set the URL fragment to the display name of an entity, causing it to be displayed (assuming it is in the
         navmap's search array. This is useful for guaranteeing a display update, for example if Wingman's hook may have
-        not loaded yet."""
+        not loaded yet. In most cases, use `displayName`."""
+        fragment = self.getFragment()
+        fragment.update(q=entityName)
+        self.setFragment(fragment)
+
+    def getFragment(self) -> Dict[str, str]:
+        """Parse the navmap's fragment to a {key: value} dict."""
+        return dict(parse.parse_qsl(self.url().fragment()))
+
+    def setFragment(self, fragment: Dict[str, str]):
+        """Set the fragment to match the keys and values given."""
         url = self.url()
-        query, noClick = list(url.fragment().split('&'))
-        url.setFragment(f'q={entityName}&{noClick}')
+        url.setFragment(parse.urlencode(fragment, quote_via=parse.quote))
         self.setUrl(url)
         self.onUrlChange()
 
