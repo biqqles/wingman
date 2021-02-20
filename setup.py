@@ -6,6 +6,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from setuptools import setup, find_namespace_packages
+from os.path import expanduser
 
 
 setup(
@@ -51,12 +52,14 @@ setup(
           ]
     },
     data_files=[
+        # we want these files to install relative to the package directory
         ('share/applications', ['packaging/linux/eu.biqqles.wingman.desktop']),
         ('share/icons/hicolor/256x256/apps', ['icons/general/wingman.png']),
+
+        # we want these to install as absolute paths
         # create file stubs for deletion of the real things upon uninstallation.
         # sadly there is no way to delete folders...
-        # also, these paths are only valid for non-sudo installs
-        ('share/wingman', ['wingman.cfg']),
-        ('share/wingman', ['wingman.log']),
+        (expanduser('~/.local/share/wingman'), ['wingman.cfg']),
+        (expanduser('~/.local/share/wingman'), ['wingman.log']),
     ],
 )
