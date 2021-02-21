@@ -177,7 +177,7 @@ class CreditsItem(NumberItem):
 
 class ProfitItem(CreditsItem):
     """An item holding information about the profit of a transaction. It displays like a CreditsItem."""
-    @dataclass
+    @dataclass(iter=True)
     class ProfitData:
         """Data for this transaction."""
         buyPrice: int
@@ -187,7 +187,19 @@ class ProfitItem(CreditsItem):
         commodity: fl.entities.Commodity
 
         def profit(self):
+            """The profit per unit for this route."""
             return (self.sellPrice - self.buyPrice) // self.commodity.volume
+
+        def label(self, buy: bool) -> str:
+            """An HTML label that summarises this route."""
+            price, base = (self.buyPrice, self.buyBase) if buy else (self.sellPrice, self.sellBase)
+            transaction = 'Buy' if buy else 'Sell'
+            return '<br/>'.join([
+                        f'<b>{transaction}: ${price:,}</b>',
+                        base.name(),
+                        f'{base.sector()}, {base.system().name()}',
+                        base.owner().name(),
+            ])
 
     def __init__(self, *args):
         data = self.ProfitData(*args)

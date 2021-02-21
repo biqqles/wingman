@@ -19,7 +19,7 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 from typing import Tuple, Optional
 from collections import defaultdict
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import flint as fl
 
 from .... import config, icons
@@ -106,8 +106,8 @@ class Merchant:
 
         # update labels
         self.widget.infoNameLabel.setText(f'<b>{data.commodity.name()}</b>')
-        self.widget.infoBuyLabel.setText(f'<b>Buy: ${data.buyPrice:,}</b><br/>{data.buyBase.name()}')
-        self.widget.infoSellLayout.setText(f'<b>Sell: ${data.sellPrice:,}</b><br/>{data.sellBase.name()}')
+        self.widget.infoBuyLabel.setText(data.label(buy=True))
+        self.widget.infoSellLayout.setText(data.label(buy=False))
 
     def display(self):
         """Display a table of the best commodities to take to and from the selected systems."""
