@@ -283,3 +283,10 @@ class AccountItem(GenericItem):
 
     def serialise(self) -> Any:
         return self.getData().hash
+
+
+class MerchantItem(EntityItem):
+    """Origin/destination item used in Merchant."""
+    @staticmethod
+    def represent(base: fl.entities.BaseSolar):
+        return f'{base.name()}, {base.system().name()} ({base.owner().short_name()})'

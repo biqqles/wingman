@@ -88,16 +88,15 @@ class Merchant:
         """Handle the table's selected row being changed."""
         if not selected.indexes():
             return
-        originBase, originSystem, destinationBase, destinationSystem, commodity, profit = \
-            (item.data(QtCore.Qt.UserRole) for item in selected.indexes())
+        commodity, profit, origin, destination = (item.data(QtCore.Qt.UserRole) for item in selected.indexes())
 
         # display commodity icon
         self.updateInfoPanel(profit)
 
         # display commodity name
         links = []
-        for system in items.fl.maps.inter_system_route(originBase.system(), destinationBase.system()):
-            links.append(f'<a href="{system.nickname}">{system.name()}</a>')
+        for system in items.fl.maps.inter_system_route(origin.system(), destination.system()):
+            links.append(f'<a href={system.nickname!r}>{system.name()}</a>')
         self.widget.infoRouteLabel.setText('Route: ' + ', '.join(links))
         self.widget.infoRouteLabel.linkActivated.connect(lambda n: self.navmap.showFromExternal(items.fl.systems[n]))
 
@@ -122,7 +121,7 @@ class Merchant:
 
         data = self.calculateRoutes(originSystem, destinationSystem, iff)
         self.widget.mainTable.populate(list(data))
-        self.widget.mainTable.sortByColumn(5, QtCore.Qt.DescendingOrder)  # sort by 'credits/unit' column
+        self.widget.mainTable.sortByColumn(1, QtCore.Qt.DescendingOrder)  # sort by 'credits/unit' column
         self.widget.mainTable.selectRow(0)
 
         self.config['lastOrigin'] = originSystem.nickname
@@ -180,7 +179,9 @@ class Merchant:
             for destPrice, destBase in destBuys[good]:  # look through each base in destination
                 for originPrice, originBase in originSells[good]:  # look through each base in origin
                     if destPrice > originPrice:
-                        yield [items.BaseItem(originBase), items.SystemItem(originBase.system()),
-                               items.BaseItem(destBase), items.SystemItem(destBase.system()),
-                               items.CommodityItem(good.commodity()),
-                               items.ProfitItem(originPrice, originBase, destPrice, destBase, good.commodity())]
+                        yield [
+                            items.CommodityItem(good.commodity()),
+                            items.ProfitItem(originPrice, originBase, destPrice, destBase, good.commodity()),
+                            items.MerchantItem(originBase),
+                            items.MerchantItem(destBase),
+                        ]

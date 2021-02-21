@@ -102,9 +102,7 @@ class MerchantTab(QtWidgets.QWidget):
         self.advancedControls.hide()
         self.advancedButton.toggled.connect(self.advancedControls.setVisible)
 
-        self.mainTable = SimpleTable(['Origin base', 'Origin system', 'Destination base', 'Destination system',
-                                      'Commodity', 'Credits/unit'])
-        self.mainTable.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.mainTable = SimpleTable(['Commodity', 'Profit/unit', 'Origin', 'Destination'])
         self.tableLayout.addWidget(self.mainTable)
 
         self.mainLayout.addLayout(self.tableLayout)
