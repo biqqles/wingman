@@ -53,7 +53,10 @@ class SimpleTable(QtWidgets.QTableView):
         verticalHeader.hide()
         verticalHeader.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         verticalHeader.setDefaultSectionSize(self.defaultRowHeight())
+
         horizontalHeader = self.horizontalHeader()
+        for i in range(len(header)):
+            horizontalHeader.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeToContents)
         horizontalHeader.setStretchLastSection(True)
         horizontalHeader.setHighlightSections(False)  # fix for ugly/nonstandard bold header on Windows
         horizontalHeader.setSectionsMovable(True)
@@ -90,8 +93,6 @@ class SimpleTable(QtWidgets.QTableView):
         self.clear()
         for row in rows:
             self.itemModel.appendRow(row)
-        if rows:
-            self.resizeColumnsToContents()
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.selectRow(0)
         self.horizontalHeader().reset()  # fix for stretchLastSection not being obeyed sometimes
