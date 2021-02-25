@@ -441,7 +441,7 @@ class ShieldsPage(EquipmentPage):
 
 class ShipsPage(EquipmentPage):
     """Database page displaying ships."""
-    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points',
+    mainTableHeadings = ['Ship', 'Class', 'Package price', 'Hit points',
                          'Turn rate (°/s)', 'Distance 0-0.5s (°)', 'Response (s)',
                          'Hold size', 'Bots', 'Bats', 'Power core', 'Recharge',
                          'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)', 'Cruise delay (s)',
