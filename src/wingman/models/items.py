@@ -301,4 +301,4 @@ class MerchantItem(EntityItem):
     """Origin/destination item used in Merchant."""
     @staticmethod
     def represent(base: fl.entities.BaseSolar):
-        return f'{base.name()}, {base.system().name()} ({base.owner().short_name()})'
+        return f'{base.system().name()}: {base.name()} ({base.owner().short_name()})'
