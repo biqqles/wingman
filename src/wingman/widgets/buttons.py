@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from .. import icons
 
@@ -31,6 +31,7 @@ class SquareButton(QtWidgets.QToolButton):
         self.setToolTip(tooltip)
         if icon:
             self.setIcon(icon)
+            self.setIconSize(QtCore.QSize(16, 16))
 
         self.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum))
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)

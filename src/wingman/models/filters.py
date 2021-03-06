@@ -18,6 +18,8 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from PyQt5 import QtCore, QtGui
 
+from . import items
+
 
 class TextFilter(QtCore.QSortFilterProxyModel):
     """A simple proxy model that filters on a configurable text query."""
@@ -28,6 +30,7 @@ class TextFilter(QtCore.QSortFilterProxyModel):
         self.setDynamicSortFilter(True)
         self.setRecursiveFilteringEnabled(True)
         self.setFilterKeyColumn(-1)  # filter on all columns
+        self.setSortRole(QtCore.Qt.DisplayRole)  # see doc string for lessThan
 
         # delegate QStandardItemModel methods
         self.invisibleRootItem = sourceModel.invisibleRootItem
@@ -36,3 +39,17 @@ class TextFilter(QtCore.QSortFilterProxyModel):
     def update(self, query: str):
         """Cause the filter to be updated with a new query."""
         self.setFilterFixedString(query)
+
+    def query(self) -> str:
+        """Return the current query for the filter."""
+        return self.filterRegExp().pattern()
+
+    def lessThan(self, left: QtCore.QModelIndex, right: QtCore.QModelIndex) -> bool:
+        """Fix sorting. Unlike QStandardItemModel, QSortFilterProxyModel isn't smart enough to try and compare the
+        items and only fall back to text when required. TODO: This workaround works, but means that sorting is slower
+        than it needs to be."""
+        leftItem: items.GenericItem = self.sourceModel().itemFromIndex(left)
+        if isinstance(leftItem, items.NumberItem):
+            rightItem: items.GenericItem = self.sourceModel().itemFromIndex(right)
+            return leftItem < rightItem
+        return super().lessThan(left, right)

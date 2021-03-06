@@ -16,9 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Dict
 from collections import defaultdict
-import os
 from functools import partial
+import os
+from urllib import parse
 
 from PyQt5 import QtWebEngineWidgets, QtCore, QtWidgets, QtGui
 import flint as fl
@@ -55,31 +57,33 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         controlsLayout = QtWidgets.QVBoxLayout(self.controlsFrame)
         controlsLayout.setContentsMargins(0, 0, 0, 0)
         controlsLayout.setSpacing(5)
-        self.connInfoB = SquareButton(icon=icons.jump, tooltip='Connected systems')
-        controlsLayout.addWidget(self.connInfoB)
-        self.forwardB = SquareButton(icon=icons.right, tooltip='Forward')
-        self.forwardB.clicked.connect(self.goForward)
-        controlsLayout.addWidget(self.forwardB)
-        self.backB = SquareButton(icon=icons.left, tooltip='Back')
-        self.backB.clicked.connect(self.goBack)
-        controlsLayout.addWidget(self.backB)
-        self.expandB = SquareButton(icon=icons.expand, tooltip='Show expanded map')
-        controlsLayout.addWidget(self.expandB)
+        self.connInfoButton = SquareButton(icon=icons.jump, tooltip='Connected systems')
+        controlsLayout.addWidget(self.connInfoButton)
+        self.forwardButton = SquareButton(icon=icons.right, tooltip='Forward')
+        self.forwardButton.clicked.connect(self.goForward)
+        controlsLayout.addWidget(self.forwardButton)
+        self.backButton = SquareButton(icon=icons.left, tooltip='Back')
+        self.backButton.clicked.connect(self.goBack)
+        controlsLayout.addWidget(self.backButton)
+        self.expandButton = SquareButton(icon=icons.expand, tooltip='Show expanded map')
+        controlsLayout.addWidget(self.expandButton)
         self.controlsFrame.setLayout(controlsLayout)
-        self.controlsFrame.show()
         self.controlsFrame.lower()
 
         # create context menu
+        # TODO it would be nice if QMenu.addAction had an overload including checkable and checked...
         self.menu = QtWidgets.QMenu()
-        self.showLabels = QtWidgets.QAction('Show labels', checkable=True, checked=True)
-        self.showLabels.toggled.connect(partial(self.setState, 'wingman.showLabels'))
-        self.showZones = QtWidgets.QAction('Show nebulae', checkable=True, checked=True)
-        self.showZones.toggled.connect(partial(self.setState, 'wingman.showZones'))
-        self.showWrecks = QtWidgets.QAction('Show wrecks', checkable=True, checked=True)
-        self.showWrecks.toggled.connect(partial(self.setState, 'wingman.showWrecks'))
+        showLabels = QtWidgets.QAction('Show labels', checkable=True, checked=True)
+        showLabels.toggled.connect(partial(self.setState, 'wingman.showLabels'))
+        showZones = QtWidgets.QAction('Show nebulae', checkable=True, checked=True)
+        showZones.toggled.connect(partial(self.setState, 'wingman.showZones'))
+        showWrecks = QtWidgets.QAction('Show wrecks', checkable=True, checked=True)
+        showWrecks.toggled.connect(partial(self.setState, 'wingman.showWrecks'))
+        self.saveAction = QtWidgets.QAction('Save map as image')  # should be available to subclasses
+        self.saveAction.triggered.connect(self.saveAsImage)
 
-        self.menu.addActions([self.showLabels, self.showWrecks, self.showZones])
-        self.menu.addAction('Save map as image').triggered.connect(self.saveAsImage)
+        self.actions = [showLabels, showWrecks, showZones, self.saveAction]
+        self.menu.addActions(self.actions)
 
         # configure settings
         self.settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.SpatialNavigationEnabled, True)
@@ -108,8 +112,8 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
             if not self.backStack or self.getDisplayed() != self.backStack[-1]:
                 self.backStack.append(self.getDisplayed())
 
-        self.backB.setEnabled(bool(len(self.backStack) - 1))
-        self.forwardB.setEnabled(bool(self.forwardsStack))
+        self.backButton.setEnabled(bool(len(self.backStack) - 1))
+        self.forwardButton.setEnabled(bool(self.forwardsStack))
 
         # get the nickname of the currently displayed entity and emit displayChanged
         self.page().runJavaScript('currentSystemNickname', self.emitDisplayChanged)
@@ -126,26 +130,35 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         """Display universe map."""
         self.page().runJavaScript("wingman.displayUniverseMap()")
 
-    def getDisplayed(self):
+    def getDisplayed(self) -> str:
         """Parse URL to resolve selected object (system/base/planet) name, or 'Sirius' if the universe map is
         displayed. """
-        fragment = self.url().fragment().split('&')[0]
-        return fragment.replace('%20', ' ')[2:].title().replace('%27', "'") if fragment else 'Sirius'
+        fragment = self.getFragment()
+        return fragment.get('q', 'Sirius')
 
-    def setDisplayed(self, entityName):
+    def setDisplayed(self, entityName: str):
         """Set the URL fragment to the display name of an entity, causing it to be displayed (assuming it is in the
         navmap's search array. This is useful for guaranteeing a display update, for example if Wingman's hook may have
-        not loaded yet."""
+        not loaded yet. In most cases, use `displayName`."""
+        fragment = self.getFragment()
+        fragment.update(q=entityName)
+        self.setFragment(fragment)
+
+    def getFragment(self) -> Dict[str, str]:
+        """Parse the navmap's fragment to a {key: value} dict."""
+        return dict(parse.parse_qsl(self.url().fragment()))
+
+    def setFragment(self, fragment: Dict[str, str]):
+        """Set the fragment to match the keys and values given."""
         url = self.url()
-        query, noClick = list(url.fragment().split('&'))
-        url.setFragment(f'q={entityName}&{noClick}')
+        url.setFragment(parse.urlencode(fragment, quote_via=parse.quote))
         self.setUrl(url)
         self.onUrlChange()
 
     def emitDisplayChanged(self, newNickname: str):
         """Emit displayChanged if required."""
         try:
-            if newNickname != 'Sirius':
+            if newNickname and newNickname != 'Sirius':
                 self.displayChanged.emit(newNickname)
         except RuntimeError:  # thrown if process is killed
             return
@@ -167,13 +180,13 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
         for system, jumps in sorted(connections.items(), key=lambda s_j: s_j[0].name()):
             action = menu.addAction(f'{system.name()} ({", ".join(j.type() for j in jumps)})')
+            action.setToolTip('\n'.join(f'{j.type()}: [{j.sector()}]' for j in jumps))
             action.triggered.connect(lambda _, system=system: self.displayEntity(system))
-            action.setToolTip(", ".join(j.sector() for j in jumps))
-        self.connInfoB.setMenu(menu)
+        self.connInfoButton.setMenu(menu)
 
     def saveAsImage(self):
         """Show a dialogue allowing the user to save the currently displayed map as a PNG image."""
-        defaultPath = os.path.expanduser('~/{}.png').format(self.getDisplayed())
+        defaultPath = os.path.expanduser('~/Pictures/{}.png').format(self.getDisplayed())
         path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                      'Save map as image',
                                                      defaultPath,
@@ -262,5 +275,5 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
             return QtCore.QTextStream(file).readAll()
         raise FileNotFoundError("MapView: couldn't load hook source")
 
-    JS_DEV_PATH = './widgets/mapview/navmap.js'
+    JS_DEV_PATH = os.path.join(os.path.dirname(__file__), 'navmap.js')
     JS_RESOURCE = ':/javascript/navmap.js'

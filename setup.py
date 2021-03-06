@@ -6,11 +6,12 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 from setuptools import setup, find_namespace_packages
+from os.path import expanduser
 
 
 setup(
     name='wingman',
-    version='0.3',
+    version='0.4.1',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
@@ -36,13 +37,13 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy>=0.6.1',
-        'fl-flint>=0.7.1',
+        'dataclassy>=0.7.1',
+        'fl-flint>=0.8',
         'fl-flair>=0.4.1',
-        'ago',
-        'Pillow',
-        'PyQt5',
-        'PyQtWebEngine',
+        'ago==0.0.93',
+        'Pillow==8.1.0',
+        'PyQt5==5.15.2',
+        'PyQtWebEngine==5.15.2',
         'rpyc; platform_system=="Linux"',
     ],
 
@@ -52,7 +53,14 @@ setup(
           ]
     },
     data_files=[
+        # we want these files to install relative to the package directory
         ('share/applications', ['packaging/linux/eu.biqqles.wingman.desktop']),
         ('share/icons/hicolor/256x256/apps', ['icons/general/wingman.png']),
+
+        # we want these to install as absolute paths
+        # create file stubs for deletion of the real things upon uninstallation.
+        # sadly there is no way to delete folders...
+        (expanduser('~/.local/share/wingman'), ['wingman.cfg']),
+        (expanduser('~/.local/share/wingman'), ['wingman.log']),
     ],
 )

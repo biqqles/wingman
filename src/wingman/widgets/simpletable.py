@@ -22,6 +22,7 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from .. import app, IS_WIN
+from ..models.filters import TextFilter
 
 
 class SimpleTable(QtWidgets.QTableView):
@@ -39,27 +40,37 @@ class SimpleTable(QtWidgets.QTableView):
         # configure model
         self.itemModel = QtGui.QStandardItemModel()
         self.itemModel.setHorizontalHeaderLabels(header)
-        self.setModel(self.itemModel)
+        self.filterModel = TextFilter(self.itemModel)
+        self.setModel(self.filterModel)
 
         # configure view
         self.setSortingEnabled(True)
         self.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.verticalHeader().hide()
-        self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
-        self.verticalHeader().setDefaultSectionSize(self.defaultRowHeight())
-        self.horizontalHeader().setStretchLastSection(True)
-        self.horizontalHeader().setHighlightSections(False)  # fix for ugly/nonstandard bold header on Windows
-        self.horizontalHeader().setSectionsMovable(True)
         self.setSelectionMode(QtWidgets.QTableView.SingleSelection)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+
+        verticalHeader = self.verticalHeader()
+        verticalHeader.hide()
+        verticalHeader.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        verticalHeader.setDefaultSectionSize(self.defaultRowHeight())
+
+        horizontalHeader = self.horizontalHeader()
+        for i in range(len(header)):
+            horizontalHeader.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeToContents)
+        horizontalHeader.setStretchLastSection(True)
+        horizontalHeader.setHighlightSections(False)  # fix for ugly/nonstandard bold header on Windows
+        horizontalHeader.setSectionsMovable(True)
+        horizontalHeader.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        horizontalHeader.setToolTip('Right-click for filters')
 
         # connections
         self.selectionModel().selectionChanged.connect(self.onSelectedRowChanged)
-        self.customContextMenuRequested.connect(self.onCustomContextMenuRequested)
+        self.customContextMenuRequested.connect(self.onMenuRequested)
+        horizontalHeader.customContextMenuRequested.connect(self.onHeaderMenuRequested)
 
         if IS_WIN:
             # attempt to match the more modern styling of QTreeView and QListWidget. Hover still doesn't work, so
-            # approach (e.g. QStyledItemDelegate) will be needed in future.
+            # another approach (e.g. QStyledItemDelegate) will be needed in future.
             self.setStyleSheet('QTableView::item:selected {'
                                '    background-color: rgb(205, 232, 255);'
                                '    color: black;'
@@ -67,6 +78,10 @@ class SimpleTable(QtWidgets.QTableView):
                                'QTableView::item:hover {'
                                '    background-color: rgb(0, 120, 215, 20%);'
                                '};')
+
+    def horizontalHeaderLabels(self) -> List[str]:
+        """Return the model's horizontal header labels (see setHorizontalHeaderLabels)"""
+        return [self.itemModel.headerData(i, QtCore.Qt.Horizontal) for i in range(self.itemModel.columnCount())]
 
     def clear(self):
         """Clear the table, without clearing the headings."""
@@ -78,8 +93,6 @@ class SimpleTable(QtWidgets.QTableView):
         self.clear()
         for row in rows:
             self.itemModel.appendRow(row)
-        if rows:
-            self.resizeColumnsToContents()
         self.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.selectRow(0)
         self.horizontalHeader().reset()  # fix for stretchLastSection not being obeyed sometimes
@@ -93,8 +106,30 @@ class SimpleTable(QtWidgets.QTableView):
         deselectedItems = (item.data(QtCore.Qt.UserRole) for item in deselected.indexes())
         self.rowDeselected.emit(deselectedItems)
 
-    def onCustomContextMenuRequested(self, point):
-        """Create a context menu."""
+    def onHeaderMenuRequested(self, pos: QtCore.QPoint):
+        """Show a context menu when the header is right-clicked."""
+        menu = QtWidgets.QMenu()
+
+        columnMenu = menu.addMenu('Column visibility')
+        for i, text in enumerate(self.horizontalHeaderLabels()):
+            item = columnMenu.addAction(text)
+            item.setCheckable(True)
+            item.setChecked(not self.isColumnHidden(i))
+            item.toggled.connect(lambda checked, index=i: self.setColumnHidden(index, not checked))
+
+        rowsMenu = menu.addMenu('Filter rows')
+        rowsEdit = QtWidgets.QLineEdit(self.filterModel.query())
+        rowsEdit.textChanged.connect(self.filterModel.update)
+        rowsEdit.setPlaceholderText('Query')
+        rowsEdit.setClearButtonEnabled(True)
+        rowFilter = QtWidgets.QWidgetAction(rowsMenu)
+        rowFilter.setDefaultWidget(rowsEdit)
+        rowsMenu.addAction(rowFilter)
+
+        menu.exec(QtGui.QCursor.pos())
+
+    def onMenuRequested(self, point):
+        """Show a context menu when a cell is right-clicked."""
         cell = self.indexAt(point)
         menu = QtWidgets.QMenu()
         copy = menu.addMenu('Copy')

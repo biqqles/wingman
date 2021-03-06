@@ -26,7 +26,8 @@ from .... import icons, IS_WIN
 
 class NavmapTab(QtWidgets.QWidget):
     """Defines the layout of the 'Navmap' tab."""
-    title = 'Navmap'
+    title = '&Navmap'
+    tooltip = 'Navigate and explore the universe'
     icon = icons.navmap
 
     def __init__(self, parent: QtWidgets.QTabWidget):

@@ -18,12 +18,14 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file defines the behaviour of the Navmap tab.
 """
-import flint as fl
-from PyQt5 import QtCore, QtWidgets
+from typing import Union
 
+from PyQt5 import QtCore, QtWidgets
+import flint as fl
+
+from .... import config, IS_WIN, flair
 from ....widgets import mapview
 from ...boxes import expandedmap
-from .... import config, IS_WIN, flair
 from .layout import NavmapTab
 
 
@@ -35,8 +37,9 @@ class Navmap:
         self.searchableEntities = fl.systems + fl.bases
         self.currentlyDisplayed = self.searchableEntities.get(self.config['last'], self.searchableEntities['li01'])
         self.widget = widget
-        self.mapView: mapview.MapView = self.widget.navmap
         self.expandedMap = expandedMap
+        self.mapView: mapview.MapView = self.widget.navmap
+        self.tabWidget: QtWidgets.QTabWidget = self.widget.parent().parent()
 
         # set up search field with completer
         completer = QtWidgets.QCompleter()
@@ -47,15 +50,14 @@ class Navmap:
 
         # connections
         self.mapView.displayChanged.connect(self.onURLChange)
-        self.mapView.displayChanged.connect(print)
         self.widget.searchEdit.textEdited.connect(self.onSearchTextEdited)
         # textEdited is only emitted on user input, but completer counts as programmatic
         completer.activated.connect(self.onSearchTextEdited)
         completer.highlighted.connect(self.onSearchTextEdited)
         # navmap buttons
-        self.mapView.backB.clicked.connect(self.widget.gotoRadioButton.click)
-        self.mapView.forwardB.clicked.connect(self.widget.gotoRadioButton.click)
-        self.mapView.expandB.clicked.connect(self.displayExpandedMap)
+        self.mapView.backButton.clicked.connect(self.widget.gotoRadioButton.click)
+        self.mapView.forwardButton.clicked.connect(self.widget.gotoRadioButton.click)
+        self.mapView.expandButton.clicked.connect(self.displayExpandedMap)
         self.widget.universeButton.clicked.connect(self.displayUniverseMap)
 
         self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentlyDisplayed.name()))
@@ -118,11 +120,20 @@ class Navmap:
 
     def displayUniverseMap(self):
         """Display an expanded universe map. Selecting a system will display it in the main navmap."""
-        self.expandedMap.displayUniverse()
+        self.expandedMap.displayUniverse(highlightedSystem=self.currentSystem.nickname)
         self.expandedMap.displayChanged.connect(lambda n: self.mapView.displayEntity(fl.systems[n]))
         self.widget.gotoRadioButton.setChecked(True)
 
     def showFromExternal(self, entity: fl.entities.Entity):
         """Switch to the Navmap tab and show `entity` on the map."""
         self.mapView.displayEntity(entity)
-        self.widget.parent().setCurrentWidget(self.widget)  # todo: doesn't update tab bar
+        self.tabWidget.setCurrentWidget(self.widget)
+        self.widget.activateWindow()
+
+    @property
+    def currentSystem(self) -> fl.entities.System:
+        """The system currently being viewed."""
+        if isinstance(self.currentlyDisplayed, fl.entities.System):
+            return self.currentlyDisplayed
+        else:
+            return self.currentlyDisplayed.system()

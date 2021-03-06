@@ -18,6 +18,8 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 
 This file defines the interface of the application's main window.
 """
+import atexit
+
 from PyQt5 import QtCore, QtWidgets
 from ... import IS_WIN, flair
 
@@ -34,6 +36,7 @@ class FlairBanner(QtWidgets.QLabel):
         self.timer.setInterval(self.UPDATE_INTERVAL)
         self.timer.timeout.connect(self.updateContents)
         self.timer.start()
+        atexit.register(self.timer.stop)
 
         self.updateContents()
         self.updatePosition()
@@ -48,7 +51,7 @@ class FlairBanner(QtWidgets.QLabel):
                 self.show()
         except AttributeError:  # flair has not been initialised yet
             self.hide()
-            
+
     def updatePosition(self):
         """Update the position of the banner so that it "sticks" to the top right of the window."""
         tabBarBottom = self.window.tw.tabBar().tabRect(0).bottom()

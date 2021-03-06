@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List, Type
+from math import degrees
 
 from PyQt5 import QtWidgets
 
@@ -29,9 +30,9 @@ class DatabasePage(QtWidgets.QSplitter):
     entity currently selected in the main table."""
     mainTableHeadings: List[str]
 
-    def __init__(self, parent, infocardView, secondaryWidget):
+    def __init__(self, parent, secondaryWidget):
         super().__init__(parent=parent, orientation=QtCore.Qt.Vertical)
-        self.infocardView = infocardView
+        self.infocardView = parent.infocardView
         self.secondaryWidget = secondaryWidget
 
         self.mainTable = SimpleTable(self.mainTableHeadings)
@@ -40,7 +41,7 @@ class DatabasePage(QtWidgets.QSplitter):
         self.setStretchFactor(0, 3)
 
         self.addWidget(self.secondaryWidget)
-        self.setStretchFactor(1, 2)
+        self.setStretchFactor(1, 1)
         self.populate()
 
         self.instance = self
@@ -66,7 +67,7 @@ class BasesPage(DatabasePage):
     mainTableHeadings = ['Base', 'Owner', 'System', 'Sector', 'Region', 'Base Nickname', 'System Nickname',
                          'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         self.marketBox = QtWidgets.QGroupBox('Market')
         self.marketLayout = QtWidgets.QHBoxLayout()
         self.marketBox.setLayout(self.marketLayout)
@@ -77,7 +78,7 @@ class BasesPage(DatabasePage):
         self.marketLayout.addWidget(self.equipmentTable)
         self.marketLayout.addWidget(self.shipTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=self.marketBox)
+        super().__init__(parent, secondaryWidget=self.marketBox)
 
     def populate(self):
         self.mainTable.populate([
@@ -130,14 +131,14 @@ class CommoditiesPage(DatabasePage):
     """Database page for commodities."""
     mainTableHeadings = ['Commodity', 'Default price', 'Volume', 'Decay', 'Nickname', 'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         marketBox = QtWidgets.QGroupBox('Economy')
         marketLayout = QtWidgets.QHBoxLayout()
         marketBox.setLayout(marketLayout)
         self.economyTable = SimpleTable(['Base', 'System', 'Price', 'Sells'])
         marketLayout.addWidget(self.economyTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=marketBox)
+        super().__init__(parent, secondaryWidget=marketBox)
 
     def populate(self):
         self.mainTable.populate([
@@ -174,14 +175,14 @@ class EquipmentPage(DatabasePage):
     mainTableHeadings = ['Name', 'Price', 'Nickname', 'Name ID', 'Info ID']
     equipmentType: Type[fl.entities.Equipment] = fl.entities.Equipment
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         availabilityBox = QtWidgets.QGroupBox('Availability')
         availabilityLayout = QtWidgets.QHBoxLayout()
         availabilityBox.setLayout(availabilityLayout)
         self.economyTable = SimpleTable(['Base', 'System', 'IFF'])
         availabilityLayout.addWidget(self.economyTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=availabilityBox)
+        super().__init__(parent, secondaryWidget=availabilityBox)
 
     def populate(self):
         """This base implementation populates the main table with fields common to all equipment types."""
@@ -193,7 +194,7 @@ class EquipmentPage(DatabasePage):
                 GenericItem(equipment.ids_name),
                 GenericItem(equipment.ids_info)
             ]
-            for equipment in fl.equipment.of_type(self.equipmentType) if equipment.good()
+            for equipment in fl.equipment.of_type(self.equipmentType) if equipment.is_valid()
         ])
 
     def onSelectedRowChanged(self, selectedItems):
@@ -213,6 +214,11 @@ class GunsPage(EquipmentPage):
                          'Dispersion (°)', 'Hull dmg', 'Shield dmg', 'Hull dps', 'Shield dps', 'Energy/s', 'Efficiency',
                          'Technology', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.Gun
+
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and not (gun.is_turret() or gun.is_missile())
 
     def populate(self):
         self.mainTable.populate([
@@ -236,7 +242,50 @@ class GunsPage(EquipmentPage):
                 GenericItem(gun.ids_name),
                 GenericItem(gun.ids_info)
             ]
-            for gun in fl.equipment.of_type(self.equipmentType) if gun.good() and gun.munition()
+            for gun in fl.equipment.of_type(self.equipmentType) if self.gunDiscriminator(gun)
+        ])
+
+
+class TurretsPage(GunsPage):
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and gun.is_turret()
+
+
+class MissilesPage(EquipmentPage):
+    """Database page displaying missiles."""
+    mainTableHeadings = ['Name', 'Price', 'Hardpoint', 'Energy/shot', 'Seeking', 'CD', 'Refire', 'Hull dmg',
+                         'Shield dmg', 'Range (m)', 'Muzzle velocity (ms⁻¹)', 'Acceleration (ms⁻²)', 'Motor delay (s)',
+                         'Nickname', 'Name ID', 'Info ID']
+    equipmentType = fl.entities.Gun
+
+    @staticmethod
+    def gunDiscriminator(gun: fl.entities.Gun) -> bool:
+        """Determine what type of gun this is."""
+        return gun.is_valid() and gun.is_missile()
+
+    def populate(self):
+        self.mainTable.populate([
+            [
+                EntityItem(missile),
+                CreditsItem(missile.price()),
+                MonospaceItem(missile.hp_gun_type),
+                NumberItem(missile.power_usage),
+                BooleanItem(missile.munition().seeker == 'lock'),
+                BooleanItem(missile.munition().cruise_disruptor or False),
+                NumberItem(missile.refire()),
+                NumberItem(missile.hull_damage()),
+                NumberItem(missile.shield_damage()),
+                NumberItem(missile.range()),
+                NumberItem(missile.muzzle_velocity),
+                NumberItem(missile.munition().motor_().accel if missile.munition().motor_() else 0),
+                NumberItem(missile.munition().motor_().delay if missile.munition().motor_() else 0),
+                MonospaceItem(missile.nickname),
+                GenericItem(missile.ids_name),
+                GenericItem(missile.ids_info)
+            ]
+            for missile in fl.equipment.of_type(self.equipmentType) if self.gunDiscriminator(missile)
         ])
 
 
@@ -257,7 +306,7 @@ class ThrustersPage(EquipmentPage):
                 GenericItem(thruster.ids_name),
                 GenericItem(thruster.ids_info),
             ]
-            for thruster in fl.equipment.of_type(self.equipmentType) if thruster.good()
+            for thruster in fl.equipment.of_type(self.equipmentType) if thruster.is_valid()
         ])
 
 
@@ -274,7 +323,7 @@ class IDsPage(EquipmentPage):
                 GenericItem(tractor.ids_name),
                 GenericItem(tractor.ids_info),
             ]
-            for tractor in fl.equipment.of_type(self.equipmentType) if tractor.good()
+            for tractor in fl.equipment.of_type(self.equipmentType) if tractor.is_valid()
         ])
 
 
@@ -294,7 +343,7 @@ class ArmourPage(EquipmentPage):
                 GenericItem(armour.ids_name),
                 GenericItem(armour.ids_info),
             ]
-            for armour in fl.equipment.of_type(self.equipmentType) if armour.good()
+            for armour in fl.equipment.of_type(self.equipmentType) if armour.is_valid()
         ])
 
 
@@ -327,7 +376,7 @@ class CountermeasuresPage(EquipmentPage):
 class MinesPage(EquipmentPage):
     """Database page displaying mine droppers."""
     mainTableHeadings = ['Name', 'Dropper price', 'Ammo price', 'Max ammo', 'Refire', 'Hull dmg', 'Shield dmg',
-                         'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (m/s⁻²)',
+                         'Explosive radius (m)', 'Seek distance (m)', 'Max speed (ms⁻¹)', 'Acceleration (ms⁻²)',
                          'Lifetime', 'Nickname', 'Name ID', 'Info ID']
     equipmentType = fl.entities.MineDropper
 
@@ -377,7 +426,7 @@ class ShieldsPage(EquipmentPage):
             [
                 EntityItem(shield),
                 CreditsItem(shield.price()),
-                GenericItem(shield.shield_type),
+                MonospaceItem(shield.shield_type),
                 NumberItem(shield.max_capacity),
                 NumberItem(shield.explosion_resistance),
                 NumberItem(shield.volume),
@@ -392,8 +441,10 @@ class ShieldsPage(EquipmentPage):
 
 class ShipsPage(EquipmentPage):
     """Database page displaying ships."""
-    mainTableHeadings = ['Ship', 'Class', 'Price', 'Hit points', 'Hold size', 'Bots', 'Bats',
-                         'Max impulse (ms⁻¹)', 'Max reverse (ms⁻¹)', 'Cruise charge (s)',
+    mainTableHeadings = ['Ship', 'Class', 'Package price', 'Hit points',
+                         'Turn rate (°/s)', 'Distance 0-0.5s (°)', 'Response (s)',
+                         'Hold size', 'Bots', 'Bats', 'Power core', 'Recharge',
+                         'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)', 'Cruise delay (s)',
                          'Nickname', 'Name ID', 'Info ID']
 
     def populate(self):
@@ -402,16 +453,21 @@ class ShipsPage(EquipmentPage):
                 GenericItem(ship.type()),
                 CreditsItem(ship.price()),
                 NumberItem(ship.hit_pts),
+                NumberItem(degrees(ship.turn_rate())),
+                NumberItem(degrees(ship.angular_distance_in_time(0.5))),
+                NumberItem(ship.response()),
                 NumberItem(ship.hold_size),
                 NumberItem(ship.nanobot_limit),
                 NumberItem(ship.shield_battery_limit),
+                NumberItem(ship.power_core().capacity),
+                NumberItem(ship.power_core().charge_rate),
                 NumberItem(ship.impulse_speed()),
                 NumberItem(ship.reverse_speed()),
                 NumberItem(ship.cruise_charge_time()),
                 MonospaceItem(ship.nickname),
                 GenericItem(ship.ids_name),
                 GenericItem(ship.ids_info),
-            ] for ship in fl.ships
+            ] for ship in fl.ships if ship.package()
         ])
 
 
@@ -419,14 +475,14 @@ class FactionsPage(DatabasePage):
     """Database page displaying factions."""
     mainTableHeadings = ['Faction', 'Short name', 'Legality', 'Nickname', 'Name ID', 'Info ID']
 
-    def __init__(self, parent, infocardView):
+    def __init__(self, parent):
         self.sheetBox = QtWidgets.QGroupBox('Rep sheet')
         sheetLayout = QtWidgets.QHBoxLayout()
         self.sheetBox.setLayout(sheetLayout)
         self.sheetTable = SimpleTable(['Faction', 'Reputation towards'])
         sheetLayout.addWidget(self.sheetTable)
 
-        super().__init__(parent, infocardView, secondaryWidget=self.sheetBox)
+        super().__init__(parent, secondaryWidget=self.sheetBox)
 
     def populate(self):
         self.mainTable.populate([[
@@ -444,7 +500,7 @@ class FactionsPage(DatabasePage):
         self.sheetTable.populate([
             [
                 FactionItem(other_faction),
-                NumberItem(rep_towards),
+                RepItem(rep_towards),
             ] for other_faction, rep_towards in faction.rep_sheet().items()
         ])
         self.sheetTable.sortByColumn(1, QtCore.Qt.DescendingOrder)  # sort by "reputation with" column

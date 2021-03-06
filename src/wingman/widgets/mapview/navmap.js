@@ -21,41 +21,61 @@ of Space's online navmap (<http://space.discoverygc.com/navmap/>) to
 make it suitable for integration into Wingman, as well as providing
 functions that can be called from Wingman to perform various actions.
 */
-
 class Wingman {
+    // Namespace for Wingman's functions.
     constructor() {
         this.head = $('head');
         this.body = $('body');
         this.searchField = $('#searchField');
 
         // config switches
-        this.autoScale = $('#switch6')[0];
         this.showLabels = $('#switch11')[0];
         this.showWrecks = $('#switch1')[0];
         this.showZones = $('#switch2')[0];
+        this.showOorp = $('#switch5')[0];
 
         this.initialiseNavmap();
     }
 
     initialiseNavmap() {
-        // Modifies the navmap's document so that it works better for our purposes
-        this.setBackgroundColour('transparent');  // remove background image and set a transparent background
-        this.setState(this.autoScale, true); // activate 'auto-scale' - required to fill the widget properly
+        // Modifies the navmap's document so that it integrates seamlessly with other widgets.
 
-        this.body.css({'overflow': 'hidden',  // hide scrollbars
-                       'margin': '0',
-                       'padding': '0em'});  // remove margin and padding - required to fill the widget properly
+        // remove background image and set a transparent background
+        this.setBackgroundColour('transparent');
 
-        $('.mapContainer').css({'border': 'none',  // hide border,
-                               'box-shadow': 'none', // border shadow,
-                               'width': '100vw',  // and fill the widget completely
-                               'height': '100vw',
-                               'top': '0'});
+        // remove margin and padding - required to fill the widget properly
+        this.body.css({
+            'overflow': 'hidden',  // hide scrollbars
+            'margin': '0',
+            'padding': '0',
+            'left': '',
+            'right': ''
+        });
 
-        $('.navContainer').css('display', 'none'); // hide the navigation panel (removing it prevents the navmap from loading fully)
+        $('.mapContainer').css({
+            'border': 'none',  // hide border,
+            'width': '100%',  // and fill the widget completely
+            'height': '100%',
+            'margin': 'none',
+            'position': 'static',
+            'cursor': 'auto'
+        });
 
-        $('.mapLegend').css({'border': 'none',  // hide border
-                            'top': '-0.2em'}); // prevent universe map legend from obscuring the top of the map
+        $('.map').css({
+            'height': '100vw',
+            'width': '100vw',
+            'box-shadow': 'none',
+            'position': 'static',
+        })
+
+         // hide the navigation panel (removing it prevents the navmap from loading fully)
+        $('.navContainer').css('display', 'none');
+
+         // prevent universe map legend from obscuring the top of the map
+        $('.mapLegend').css({
+            'border': 'none',  // hide border
+            'top': '-0.2em'
+        });
 
         // miscellaneous behaviour modifications
         document.onmousedown = () => false;  // disable the ability to highlight text...
@@ -86,6 +106,28 @@ class Wingman {
         generateUniverseMap();
     }
 
+    highlightSystem(systemNickname) {
+        // Highlight a system on the universe map.
+        // Right now this is only used to show the current navmap system in the universe map.
+        // In the future it will be used to display the start and destination for route planning.
+
+        $('.system').children().css({  // todo: hacky workaround for weird need to reset
+            'color': 'white',
+            'font-weight': 'normal',
+        });
+
+        $(`[data-system-nickname='${systemNickname}']`).children().css({
+            'color': 'gold',
+            'font-weight': 'bold',
+        });
+    }
+
+    drawShip(x, y, z) {
+        // Remove any existing ship markers and draw a new one at the given coordinates.
+        $(".playerShip").remove();
+        new mapObject("playerShip latestPos", x, y, z, 0, 0, 0, 0);
+    }
+
     onDisplayChanged() {
         // Handle the displayed system or solar being changed
         $('.systemTitle').css('font-size', '2em');
@@ -94,12 +136,12 @@ class Wingman {
         // system's nickname, respectively. Abusing this variable is (very) hacky but convenient because it is reliably updated
         // as soon as a new system is entered.
         const nicknameToUrl = () => updateFragment('q', currentSystemNickname);
-        $(".object, .zone").click(function() {
+        $(".object, .zone").click(function () {
             currentSystemNickname = $(this).attr("data-internal-nickname");
             nicknameToUrl();
         });
 
-        $(".grid").click(function() {
+        $(".grid").click(function () {
             currentSystemNickname = currentSystem;
             nicknameToUrl();
         });

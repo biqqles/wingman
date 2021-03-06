@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from typing import Optional
 from PyQt5 import QtCore, QtWidgets
 
-from .pages import BasesPage, CommoditiesPage, FactionsPage, ShipsPage, GunsPage, ThrustersPage, ArmourPage, IDsPage, \
-                    CountermeasuresPage, ShieldsPage, MinesPage, CloaksPage, EnginesPage
+from .pages import *
+from ... import app
 from ...widgets.infocardview import InfocardView
 from ...widgets.scrollablelist import ScrollableList
 
@@ -28,7 +28,8 @@ from ...widgets.scrollablelist import ScrollableList
 class Database(QtWidgets.QDialog):
     """The Database dialogue provides a spreadsheet-esque window into every entity defined in Freelancer. It more or
     less replicates the functionality of FLStat, using flint as a backend."""
-    title = f'Database'
+    title = 'Database'
+    tooltip = 'View game data in tabular form'
     defaultDimensions = (1400, 800)
 
     def __init__(self):
@@ -43,22 +44,38 @@ class Database(QtWidgets.QDialog):
 
         viewSelector = ScrollableList(sorted(HEADINGS.keys()))
         viewSelector.setCurrentRow(1)
-        viewSelector.currentTextChanged.connect(self.onSelectorChanged)
+        viewSelector.currentTextChanged.connect(self.displayPage)
         self.mainLayout.addWidget(viewSelector, 0)
 
         self.infocardView = InfocardView(self)
-        self.currentPage = BasesPage(self, self.infocardView)
-        self.mainLayout.addWidget(self.currentPage, 4)
-        self.mainLayout.addWidget(self.infocardView, 2)
+        self.currentPage = None
+        self.mainSplitter = QtWidgets.QSplitter()
+        self.mainSplitter.addWidget(self.infocardView)
+        self.mainLayout.addWidget(self.mainSplitter)
+
+        self.displayPage('Bases')
         self.show()
 
-    def onSelectorChanged(self, name):
-        if HEADINGS[name] not in self.pagesCache:
-            self.pagesCache[HEADINGS[name]] = HEADINGS[name](self, self.infocardView)
-        newPage = self.pagesCache[HEADINGS[name]]
+    def displayPage(self, name: str):
+        """Display the page with the given name."""
+        app.setOverrideCursor(QtCore.Qt.WaitCursor)
 
-        self.currentPage.hide()
-        self.mainLayout.replaceWidget(self.currentPage, newPage)
+        try:
+            if HEADINGS[name] not in self.pagesCache:
+                self.pagesCache[HEADINGS[name]] = HEADINGS[name](self)
+            newPage = self.pagesCache[HEADINGS[name]]
+        except:
+            raise
+        finally:
+            app.restoreOverrideCursor()
+
+        if self.currentPage:  # replace or insert the page
+            self.currentPage.hide()
+            self.mainSplitter.replaceWidget(0, newPage)
+        else:
+            self.mainSplitter.insertWidget(0, newPage)
+            self.mainSplitter.setCollapsible(0, False)
+
         self.currentPage = newPage
         self.currentPage.show()
 
@@ -77,4 +94,6 @@ HEADINGS = {
     'Shields': ShieldsPage,
     'Cloaks': CloaksPage,
     'Engines': EnginesPage,
+    'Missiles': MissilesPage,
+    'Turrets': TurretsPage,
 }

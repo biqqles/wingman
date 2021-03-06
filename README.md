@@ -32,15 +32,17 @@ Alternatively, if you have Python 3.7 or higher installed, you can use the insta
 ### Installing on Linux
 Assuming you have Python 3.7 or higher installed and available as `python3`, simply run `python3 -m pip install wingman`.
 
-After installation the application should be available either from your desktop's application menu or, if you ran pip with sudo, by running `wingman` in a terminal. (You may need to log in and out to get the icon to show.)
+After installation the application should be available either from your desktop's application menu or, if you ran pip with sudo, by running `wingman` in a terminal.
 
-To uninstall, run `python3 -m pip uninstall wingman`.
+To upgrade, run `python3 -m pip install -U wingman`. To uninstall, run `python3 -m pip uninstall wingman`.
+
+Note that the latest version available on PyPI may not match the latest version number for Windows because minor bugfix releases that only affect Windows are not published on PyPI.
 
 The application will probably be installable on macOS using the above commands but I'm unable to test this platform myself. If someone was able to try it out that would be great.
 
 #### Native styling
 Because the PyQt wheels do not include platform-specific style plugins, Wingman will run with the default Fusion theme when using pip-installed PyQt5. This works OK, but if you prefer native theming (e.g. Breeze on a KDE system) you need to install the PyQt5 packages from your distro's package manager rather than pip. Unless you want to build PyQt from source, **this is only possible if your distro provides a PyQt5 package for Python 3.7 or higher**. This rules out Ubuntu LTS, as at the time of writing packages are built only for Python 3.6.
-many
+
 - Uninstall the `PyQt5` and `PyQtWebEngine` packages with pip
 - Install `python-pyqt5` and `python-pyqtwebengine` (e.g. if you use pacman) or `python3-pyqt5` and `python3-pyqt5.qtwebengine` (if you use apt) with your package manager
 
@@ -52,11 +54,11 @@ Ensure PyQt5 is installed. The included `pyrcc5` utility is required for buildin
 For both platforms (Windows and Linux), the first step is always to compile a fresh copy of the Qt resource file containing the icons and text files the application needs, using `pyrcc5`. From the root directory, run `pyrcc5 src/resources.qrc -o src/wingman/resources.py`
 
 ### For Windows
-From the root directory, `cd packaging/windows`. Ensure that [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/) is installed, in addition to the application's own requirements.
+From the root directory, `cd packaging/windows`. Ensure that the contents of `build_requirements.txt` are installed, in addition to the application's own requirements. The application is built against Python 3.8, the [last version](https://bugs.python.org/issue32592) to support Windows 7.
 
 Now run `build.bat` to build a one folder application and an installer.
 
 ### For Linux
-Again from the root directory, run `python setup.py sdist` to build a source distribution.
+From the root directory, `cd packaging/linux` and run `build.sh` to build a source distribution.
 
 To now install your locally-built distribution, run `pip install dist/wingman-*.tar.gz`.

@@ -9,8 +9,10 @@ ROOT = os.path.dirname(os.path.dirname(os.getcwd()))
 
 a = Analysis([os.path.join(ROOT, 'src', 'wingman', 'main.py')],
              pathex=[os.path.join(ROOT, 'src'), QT_BIN],
-             binaries=[(os.path.join(QT_BIN, dll), '.') for dll in ('libEGL.dll', 'libGLESv2.dll', 'd3dcompiler_47.dll')], # ANGLE binaries, needed for some systems
-             datas=[('../../LICENSE.txt', '.'), ('../../README.md', '.'), ('../../src/wingman/', 'wingman')],  # the package itself is included as the loader expects it
+             # ANGLE binaries, needed for some systems
+             binaries=[(os.path.join(QT_BIN, dll), '.') for dll in
+                       ('libEGL.dll', 'libGLESv2.dll', 'd3dcompiler_47.dll')],
+             datas=[('../../LICENSE.txt', '.'), ('../../README.md', '.'), ('wingman.cp38-win32.pyd', '.')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -18,11 +20,11 @@ a = Analysis([os.path.join(ROOT, 'src', 'wingman', 'main.py')],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=None)
-             
+
 pyz = PYZ(a.pure,
           a.zipped_data,
           cipher=None)
-          
+
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
@@ -33,12 +35,12 @@ exe = EXE(pyz,
           console=False,
           uac_admin=False,
           icon=os.path.join(ROOT, 'icons', 'general', 'wingman.ico'))
-          
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
                strip=False,
                upx=False,
-	           debug=False,
+               debug=False,
                name='Wingman')
