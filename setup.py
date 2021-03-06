@@ -43,6 +43,7 @@ setup(
         'Pillow',
         'PyQt5',
         'PyQtWebEngine',
+        'rpyc; platform_system=="Linux"',
     ],
 
     entry_points={
