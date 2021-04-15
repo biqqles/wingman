@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 from typing import List, Type
+from collections import defaultdict
 from math import degrees
 
 from PyQt5 import QtWidgets
@@ -461,10 +462,24 @@ class ShipsPage(DatabasePage):
         hardpointsBox = QtWidgets.QGroupBox('Hardpoints')
         hardpointsLayout = QtWidgets.QHBoxLayout()
         hardpointsBox.setLayout(hardpointsLayout)
-        self.hardpointsTable = SimpleTable([])
-        self.hardpointsTable.verticalHeader().show()
-        self.hardpointsTable.horizontalHeader().hide()
-        hardpointsLayout.addWidget(self.hardpointsTable)
+        self.hardpointsTabs = QtWidgets.QTabWidget()
+
+        self.weaponsTable = SimpleTable([])
+        self.weaponsTable.verticalHeader().show()
+        self.weaponsTable.horizontalHeader().hide()
+        self.hardpointsTabs.addTab(self.weaponsTable, 'Weapons')
+
+        self.externalTable = SimpleTable([])
+        self.externalTable.verticalHeader().show()
+        self.externalTable.horizontalHeader().hide()
+        self.hardpointsTabs.addTab(self.externalTable, 'External')
+
+        self.internalTable = SimpleTable([])
+        self.internalTable.verticalHeader().show()
+        self.internalTable.horizontalHeader().hide()
+        self.hardpointsTabs.addTab(self.internalTable, 'Internal')
+
+        hardpointsLayout.addWidget(self.hardpointsTabs)
 
         secondaryLayout.addWidget(availabilityBox)
         secondaryLayout.addWidget(hardpointsBox)
@@ -504,12 +519,19 @@ class ShipsPage(DatabasePage):
             ] for base in ship.sold_at() if base.has_solar()
         ])
 
-        self.hardpointsTable.populate([
-            [
-                GenericItem(' OR '.join((w.name() for w in weapon_classes))),
-            ] for weapon_classes in ship.hardpoints().values()
-        ])
-        self.hardpointsTable.model().sort(-1)
+        # organise hardpoints by category
+        hardpoint_items = defaultdict(list)
+        for h in ship.hardpoints().values():
+            hardpoint_items[h[0].category()].append(GenericItem(' OR '.join((w.name() for w in h))))
+
+        self.weaponsTable.populate(hardpoint_items['weapons'])
+        self.weaponsTable.model().sort(-1)
+
+        self.externalTable.populate(hardpoint_items['external'])
+        self.externalTable.model().sort(-1)
+
+        self.internalTable.populate(hardpoint_items['internal'])
+        self.internalTable.model().sort(-1)
 
 
 class FactionsPage(DatabasePage):
