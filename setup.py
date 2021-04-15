@@ -37,11 +37,11 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy==0.7.2',
+        'dataclassy>=0.8',
         'fl-flint>=0.8.1',
         'fl-flair>=0.5.0; platform_system=="Windows"',
         'ago==0.0.93',
-        'Pillow==8.1.2',
+        'Pillow>=8.1',
         'PyQt5==5.15.4',
         'PyQtWebEngine==5.15.4',
     ],
