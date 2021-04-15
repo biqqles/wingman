@@ -439,13 +439,37 @@ class ShieldsPage(EquipmentPage):
         ])
 
 
-class ShipsPage(EquipmentPage):
+class ShipsPage(DatabasePage):
     """Database page displaying ships."""
     mainTableHeadings = ['Ship', 'Class', 'Package price', 'Hit points',
                          'Turn rate (°/s)', 'Distance 0-0.5s (°)', 'Response (s)',
                          'Hold size', 'Bots', 'Bats', 'Power core', 'Recharge',
                          'Impulse speed (ms⁻¹)', 'Reverse speed (ms⁻¹)', 'Cruise delay (s)',
                          'Nickname', 'Name ID', 'Info ID']
+
+    def __init__(self, parent):
+        secondaryWidget = QtWidgets.QWidget(parent)
+        secondaryLayout = QtWidgets.QHBoxLayout()
+        secondaryWidget.setLayout(secondaryLayout)
+
+        availabilityBox = QtWidgets.QGroupBox('Availability')
+        availabilityLayout = QtWidgets.QHBoxLayout()
+        availabilityBox.setLayout(availabilityLayout)
+        self.economyTable = SimpleTable(['Base', 'System', 'IFF'])
+        availabilityLayout.addWidget(self.economyTable)
+
+        hardpointsBox = QtWidgets.QGroupBox('Hardpoints')
+        hardpointsLayout = QtWidgets.QHBoxLayout()
+        hardpointsBox.setLayout(hardpointsLayout)
+        self.hardpointsTable = SimpleTable([])
+        self.hardpointsTable.verticalHeader().show()
+        self.hardpointsTable.horizontalHeader().hide()
+        hardpointsLayout.addWidget(self.hardpointsTable)
+
+        secondaryLayout.addWidget(availabilityBox)
+        secondaryLayout.addWidget(hardpointsBox)
+
+        super().__init__(parent, secondaryWidget=secondaryWidget)
 
     def populate(self):
         self.mainTable.populate([[
@@ -469,6 +493,23 @@ class ShipsPage(EquipmentPage):
                 GenericItem(ship.ids_info),
             ] for ship in fl.ships if ship.package()
         ])
+
+    def onSelectedRowChanged(self, selectedItems):
+        ship = super().onSelectedRowChanged(selectedItems)
+        self.economyTable.populate([
+            [
+                BaseItem(base),
+                SystemItem(base.system_()),
+                FactionItem(base.owner()),
+            ] for base in ship.sold_at() if base.has_solar()
+        ])
+
+        self.hardpointsTable.populate([
+            [
+                GenericItem(' OR '.join((w.name() for w in weapon_classes))),
+            ] for weapon_classes in ship.hardpoints().values()
+        ])
+        self.hardpointsTable.model().sort(-1)
 
 
 class FactionsPage(DatabasePage):
