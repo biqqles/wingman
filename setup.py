@@ -42,8 +42,8 @@ setup(
         'fl-flair>=0.5.0; platform_system=="Windows"',
         'ago==0.0.93',
         'Pillow>=8.1',
-        'PyQt5==5.15.4',
-        'PyQtWebEngine==5.15.4',
+        'PyQt5>=5.15.0',
+        'PyQtWebEngine>=5.15.0',
     ],
 
     entry_points={
