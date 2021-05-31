@@ -180,7 +180,7 @@ class EquipmentPage(DatabasePage):
         availabilityBox = QtWidgets.QGroupBox('Availability')
         availabilityLayout = QtWidgets.QHBoxLayout()
         availabilityBox.setLayout(availabilityLayout)
-        self.economyTable = SimpleTable(['Base', 'System', 'IFF'])
+        self.economyTable = SimpleTable(['Base', 'System', 'IFF', 'Base nickname'])
         availabilityLayout.addWidget(self.economyTable)
 
         super().__init__(parent, secondaryWidget=availabilityBox)
@@ -205,6 +205,7 @@ class EquipmentPage(DatabasePage):
                 BaseItem(base),
                 SystemItem(base.system_()),
                 FactionItem(base.owner()),
+                MonospaceItem(base.nickname),
             ] for base in equipment.sold_at() if base.has_solar()
         ])
 
