@@ -180,7 +180,7 @@ class EquipmentPage(DatabasePage):
         availabilityBox = QtWidgets.QGroupBox('Availability')
         availabilityLayout = QtWidgets.QHBoxLayout()
         availabilityBox.setLayout(availabilityLayout)
-        self.economyTable = SimpleTable(['Base', 'System', 'IFF', 'Base nickname'])
+        self.economyTable = SimpleTable(['Base', 'System', 'IFF', 'Nickname'])
         availabilityLayout.addWidget(self.economyTable)
 
         super().__init__(parent, secondaryWidget=availabilityBox)
