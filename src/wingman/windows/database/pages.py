@@ -136,7 +136,7 @@ class CommoditiesPage(DatabasePage):
         marketBox = QtWidgets.QGroupBox('Economy')
         marketLayout = QtWidgets.QHBoxLayout()
         marketBox.setLayout(marketLayout)
-        self.economyTable = SimpleTable(['Base', 'System', 'Price', 'Sells'])
+        self.economyTable = SimpleTable(['Base', 'System', 'Price', 'Sells', 'Nickname'])
         marketLayout.addWidget(self.economyTable)
 
         super().__init__(parent, secondaryWidget=marketBox)
@@ -164,7 +164,8 @@ class CommoditiesPage(DatabasePage):
                 BaseItem(base),
                 SystemItem(base.system_()),
                 CreditsItem(price),
-                BooleanItem(base in sold)
+                BooleanItem(base in sold),
+                MonospaceItem(base.nickname),
             ]
             for base, price in {**bought, **sold}.items() if base.has_solar()
         ])
@@ -457,7 +458,7 @@ class ShipsPage(DatabasePage):
         availabilityBox = QtWidgets.QGroupBox('Availability')
         availabilityLayout = QtWidgets.QHBoxLayout()
         availabilityBox.setLayout(availabilityLayout)
-        self.economyTable = SimpleTable(['Base', 'System', 'IFF'])
+        self.economyTable = SimpleTable(['Base', 'System', 'IFF', 'Nickname'])
         availabilityLayout.addWidget(self.economyTable)
 
         hardpointsBox = QtWidgets.QGroupBox('Hardpoints')
@@ -517,6 +518,7 @@ class ShipsPage(DatabasePage):
                 BaseItem(base),
                 SystemItem(base.system_()),
                 FactionItem(base.owner()),
+                MonospaceItem(base.nickname),
             ] for base in ship.sold_at() if base.has_solar()
         ])
 
