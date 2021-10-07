@@ -84,7 +84,7 @@ class Navmap:
                 system = fl.systems[nickname]
                 self.searchableEntities += system.contents()  # load system contents
                 self.mapView.displayConnMenu(system)
-            self.config['last'] = nickname
+                self.config['last'] = nickname
 
     def onSearchTextEdited(self, query: str):
         """Handle the search field's text being edited by the user."""
