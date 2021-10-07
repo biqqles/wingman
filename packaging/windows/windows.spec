@@ -9,9 +9,6 @@ ROOT = os.path.dirname(os.path.dirname(os.getcwd()))
 
 a = Analysis([os.path.join(ROOT, 'src', 'wingman', 'main.py')],
              pathex=[os.path.join(ROOT, 'src'), QT_BIN],
-             # ANGLE binaries, needed for some systems
-             binaries=[(os.path.join(QT_BIN, dll), '.') for dll in
-                       ('libEGL.dll', 'libGLESv2.dll', 'd3dcompiler_47.dll')],
              datas=[('../../LICENSE.txt', '.'), ('../../README.md', '.'), ('wingman.cp38-win32.pyd', '.')],
              hiddenimports=[],
              hookspath=[],
