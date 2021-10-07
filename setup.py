@@ -11,7 +11,7 @@ from os.path import expanduser
 
 setup(
     name='wingman',
-    version='0.4.1',
+    version='5.0',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',
@@ -37,8 +37,8 @@ setup(
 
     python_requires='>=3.7',
     install_requires=[
-        'dataclassy>=0.8',
-        'fl-flint>=0.8.1',
+        'dataclassy>=0.10.0',
+        'fl-flint>=0.9.0',
         'fl-flair>=0.5.0; platform_system=="Windows"',
         'ago==0.0.93',
         'Pillow>=8.1',
