@@ -59,7 +59,6 @@ setup(
         # we want these to install as absolute paths
         # create file stubs for deletion of the real things upon uninstallation.
         # sadly there is no way to delete folders...
-        (expanduser('~/.local/share/wingman'), ['wingman.cfg']),
         (expanduser('~/.local/share/wingman'), ['wingman.log']),
     ],
 )

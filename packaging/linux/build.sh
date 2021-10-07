@@ -12,7 +12,6 @@ pyrcc5 src/resources.qrc -o src/wingman/resources.py
 
 # create dummy files so that pip will delete the real things on uninstall
 # unfortunately there's no way to do this for directories, so these will remain
-cp src/default.cfg wingman.cfg
 touch wingman.log
 
 # actually build the distribution. Building a wheel breaks several options in
@@ -20,4 +19,4 @@ touch wingman.log
 python3 setup.py sdist
 
 # delete dummy files
-rm -r wingman.cfg wingman.log
+rm -r wingman.log
