@@ -48,17 +48,19 @@ Because the PyQt wheels do not include platform-specific style plugins, Wingman 
 
 
 ## Building and packaging
-### Prerequisites (for all platforms)
-Ensure PyQt5 is installed. The included `pyrcc5` utility is required for building.
+### CI
+A [workflow](.github/workflows/build.yml) exists that produces automated builds for Linux and Windows.
 
-For both platforms (Windows and Linux), the first step is always to compile a fresh copy of the Qt resource file containing the icons and text files the application needs, using `pyrcc5`. From the root directory, run `pyrcc5 src/resources.qrc -o src/wingman/resources.py`
+### Local
+#### Prerequisites (for all platforms)
+Ensure the development dependencies in `requirements.txt` are installed. To build on Windows you will additionally need to install the requirements of the application itself listed in `setup.py`.
 
-### For Windows
-From the root directory, `cd packaging/windows`. Ensure that the contents of `build_requirements.txt` are installed, in addition to the application's own requirements. The application is built against Python 3.8, the [last version](https://bugs.python.org/issue32592) to support Windows 7.
+#### For Windows
+From the root directory, `cd packaging/windows`.
 
-Now run `build.bat` to build a one folder application and an installer.
+Run `build.bat` to build a one folder application and an installer. The application is built against Python 3.8, the [last version](https://bugs.python.org/issue32592) to support Windows 7.
 
-### For Linux
+#### For Linux
 From the root directory, `cd packaging/linux` and run `build.sh` to build a source distribution.
 
-To now install your locally-built distribution, run `pip install dist/wingman-*.tar.gz`.
+To install your locally-built distribution, run `pip install dist/wingman-*.tar.gz`.

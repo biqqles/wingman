@@ -1,0 +1,53 @@
+name: build
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        
+      - name: Run build script
+        run: |
+          pip install -r requirements.txt
+          cd packaging/linux
+          source build.sh
+          
+      - name: Upload release for Linux
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-release
+          path: dist/*
+          
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        
+      - name: Configure Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+          architecture: x86
+
+      - name: Install dependencies
+        run: |
+          pip install .
+          pip install -r requirements.txt
+
+      - name: Run build script
+        run: |
+          cd packaging/windows
+          build.bat
+        shell: cmd
+        
+      - name: Upload release for Windows
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-release
+          path: packaging/windows/dist/wingman-*

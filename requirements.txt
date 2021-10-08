@@ -1,0 +1,3 @@
+Nuitka; platform_system=="Windows"
+PyInstaller; platform_system=="Windows"
+PyQt5

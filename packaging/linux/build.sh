@@ -5,7 +5,7 @@ cd ../..
 
 # clean up from previous builds
 python3 setup.py clean
-rm dist/*
+rm -f dist/*
 
 # ensure resources are up to date
 pyrcc5 src/resources.qrc -o src/wingman/resources.py
