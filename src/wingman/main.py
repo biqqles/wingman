@@ -23,7 +23,7 @@ import sys
 from PyQt5 import QtWidgets
 import flint as fl
 
-from wingman import app, config, IS_WIN  # non-relative imports for the benefit of PyInstaller
+from wingman import app, config, IS_WIN, RESTART_EXIT_CODE  # non-relative imports for the benefit of PyInstaller
 from wingman.windows.main.layout import MainWindow
 from wingman.windows.boxes import configuration
 
@@ -56,7 +56,9 @@ def main() -> int:
 
 
 if __name__ == '__main__':
-    result = main()
+    result = RESTART_EXIT_CODE
+    while result == RESTART_EXIT_CODE:
+        result = main()
     if IS_WIN:
         flair.state.end_polling()
     sys.exit(result)

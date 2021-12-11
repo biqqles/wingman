@@ -24,7 +24,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import flint as fl
 
 from ...widgets.pathedit import PathEdit
-from ... import IS_WIN, config
+from ... import IS_WIN, config, restart
 
 
 class ConfigurePaths(QtWidgets.QDialog):
@@ -62,7 +62,7 @@ class ConfigurePaths(QtWidgets.QDialog):
         self.buttons = QtWidgets.QDialogButtonBox()
         self.buttons.addButton(QtWidgets.QDialogButtonBox.Save)
         self.buttons.addButton(QtWidgets.QDialogButtonBox.Cancel)
-        self.buttons.accepted.connect(self.writeConfig)
+        self.buttons.accepted.connect(self.save)
         self.buttons.rejected.connect(self.close)
         self.mainLayout.addWidget(self.buttons)
 
@@ -84,6 +84,11 @@ class ConfigurePaths(QtWidgets.QDialog):
         config.paths['my_games'] = self.myGamesDirEdit.lineEdit.text()
         config.commit()
         self.close()
+
+    def save(self):
+        """Action the user saving the new config."""
+        self.writeConfig()
+        restart()
 
     def closeEvent(self, event: QtGui.QCloseEvent):
         """If the dialogue is mandatory, quit the application."""

@@ -27,8 +27,10 @@ import logging
 import signal
 import sys
 
-# noinspection PyUnresolvedReferences
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets  # WebEngine must be imported here before QApp init
+import flint as fl
+
+# noinspection PyUnresolvedReferences
 from . import resources  # register resources
 from . import namespaces
 
@@ -94,3 +96,11 @@ if not IS_WIN:
     if QtWidgets.QStyleFactory.keys() == ['Windows', 'Fusion']:
         logging.warning("Native Qt style not available. Defaulting to Fusion - the application may not render "
                         "correctly. To fix this, install the PyQt5 packages from your distro's repos, not pip.")
+
+
+RESTART_EXIT_CODE = 55
+
+
+def restart():
+    """Restart the app. RESTART_EXIT_CODE is handled in the application entry point."""
+    app.exit(RESTART_EXIT_CODE)

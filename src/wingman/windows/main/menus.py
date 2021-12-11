@@ -28,7 +28,7 @@ import flint as fl
 
 from ..database.layout import Database
 from ..boxes import configuration, about
-from ... import config, IS_WIN
+from ... import config, IS_WIN, app, restart
 
 if IS_WIN:
     import flair
@@ -159,8 +159,9 @@ class File(SimpleMenu):
 
         Separator(),
 
-        SimpleAction('Reload game files')  # todo: run
-            .withShortcut('Ctrl+R'),
+        SimpleAction('Reload game files')
+            .withShortcut('Ctrl+R')
+            .onTrigger(restart),
     ]
 
     submenus = [
