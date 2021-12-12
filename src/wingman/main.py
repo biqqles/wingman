@@ -52,6 +52,10 @@ def main() -> int:
 
     mainWindow = MainWindow()
 
+    # force first window instance to disappear upon restart on Windows;
+    # for some reason this does not happen by default
+    app.aboutToQuit.connect(mainWindow.close)
+
     return app.exec()
 
 
