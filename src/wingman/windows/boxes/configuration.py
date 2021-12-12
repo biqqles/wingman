@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os.path
-from pathlib import Path
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -53,9 +52,11 @@ class ConfigurePaths(QtWidgets.QDialog):
         self.freelancerDirEdit.lineEdit.textChanged.connect(self.validate)
         self.formLayout.addRow('Freelancer directory', self.freelancerDirEdit)
 
-        defaultMyGamesDir = config.paths['my_games'] or \
-            (os.path.expanduser(r'~\Documents\My Games' if IS_WIN else '~'))
-        self.myGamesDirEdit = PathEdit(defaultMyGamesDir, lambda path: Path(path).name == 'My Games')
+        defaultMyGamesDir = (config.paths['my_games'] or
+                             os.path.expanduser('~/Documents/My Games' if IS_WIN else '~')).replace(os.sep, '/')
+
+        self.myGamesDirEdit = PathEdit(defaultMyGamesDir,
+                                       lambda path: os.path.basename(path.rstrip(r'\/')) == 'My Games')
         self.myGamesDirEdit.lineEdit.textChanged.connect(self.validate)
         self.formLayout.addRow("'My Games' directory", self.myGamesDirEdit)
 
@@ -80,8 +81,8 @@ class ConfigurePaths(QtWidgets.QDialog):
     def writeConfig(self):
         """Commit the changes to the config file to disk. It should only be possible to call this after the paths
         have been confirmed as valid."""
-        config.paths['freelancer_dir'] = self.freelancerDirEdit.lineEdit.text()
-        config.paths['my_games'] = self.myGamesDirEdit.lineEdit.text()
+        config.paths['freelancer_dir'] = self.freelancerDirEdit.lineEdit.text().rstrip(r'\/')
+        config.paths['my_games'] = self.myGamesDirEdit.lineEdit.text().rstrip(r'\/')
         config.commit()
         self.close()
 

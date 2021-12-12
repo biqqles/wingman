@@ -251,7 +251,7 @@ class Preferences(SimpleMenu):
         SimpleAction('Export preferences')
             .onTrigger(lambda: Preferences.exportPreferences()),
         SimpleAction('Reset to defaults')
-            .onTrigger(config.reset),
+            .onTrigger(lambda: config.reset() or restart()),
     ]
 
     @staticmethod

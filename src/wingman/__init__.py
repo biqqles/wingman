@@ -28,7 +28,6 @@ import signal
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets  # WebEngine must be imported here before QApp init
-import flint as fl
 
 # noinspection PyUnresolvedReferences
 from . import resources  # register resources
@@ -52,7 +51,6 @@ app = QtWidgets.QApplication([__app__.lower()])
 app.setApplicationDisplayName(__app__)
 app.setApplicationName(__app__.lower())
 app.setWindowIcon(QtGui.QIcon(':/general/main'))
-app.setAttribute(QtCore.Qt.AA_UseSoftwareOpenGL)  # disable hardware acceleration
 
 # switch current working directory to a suitable location to store app data
 dataLocation = QtCore.QStandardPaths.writableLocation(QtCore.QStandardPaths.AppLocalDataLocation)
