@@ -21,6 +21,8 @@ of Space's online navmap (<http://space.discoverygc.com/navmap/>) to
 make it suitable for integration into Wingman, as well as providing
 functions that can be called from Wingman to perform various actions.
 */
+
+// noinspection JSUnusedGlobalSymbols,JSUnresolvedFunction,JSUnresolvedVariable,JSUndeclaredVariable,JSCheckFunctionSignatures
 class Wingman {
     // Namespace for Wingman's functions.
     constructor() {
@@ -79,7 +81,7 @@ class Wingman {
 
         // miscellaneous behaviour modifications
         document.onmousedown = () => false;  // disable the ability to highlight text...
-        $('<style type="text/css">body{cursor: pointer;}</style>').appendTo(this.head);  // and the 'I' selection cursor
+        $('<style>body{cursor: pointer;}</style>').appendTo(this.head);  // and the 'I' selection cursor
 
         // hook generateMap and generateUniverseMap. Not very pleasant, but I don't believe there's a better way
         const originalGenMap = generateMap;
@@ -160,7 +162,7 @@ class Wingman {
 
     setBackgroundColour(colour) {
         // Removes the background graphic and sets the given background colour
-        $(`<style type='text/css'>body:after{background: ${colour};}</style>`).appendTo(this.head);
+        $(`<style>body:after{background: ${colour};}</style>`).appendTo(this.head);
     }
 }
 
