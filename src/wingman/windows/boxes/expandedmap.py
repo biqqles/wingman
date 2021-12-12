@@ -60,7 +60,7 @@ class ExpandedMap(MapView):
             self.displayChanged.disconnect()
         except TypeError:  # raised when no callbacks are connected
             pass
-        self.displayChanged.connect(lambda: self.setWindowTitle(self.getDisplayed()))
+        self.displayChanged.connect(lambda: self.setWindowTitle(self.getDisplayed().title()))
         self.display()
 
     def displayUniverse(self, highlightedSystem=None):
