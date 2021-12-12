@@ -161,7 +161,7 @@ class File(SimpleMenu):
 
         SimpleAction('Reload game files')
             .withShortcut('Ctrl+R')
-            .onTrigger(restart),
+            .onTrigger(lambda: fl.invalidate_cache() or restart()),
     ]
 
     submenus = [
