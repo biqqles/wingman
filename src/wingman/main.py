@@ -50,11 +50,11 @@ def main() -> int:
                                   "Check that Freelancer is not running as administrator and try again.").exec()
             return 1
 
-    mainWindow = MainWindow()
+    MainWindow()
 
-    # force first window instance to disappear upon restart on Windows;
-    # for some reason this does not happen by default
-    app.aboutToQuit.connect(mainWindow.close)
+    # force windows to disappear upon quit on Windows;
+    # for some reason this does not happen by default when restarting
+    app.aboutToQuit.connect(lambda: [w.close() for w in app.topLevelWindows()])
 
     return app.exec()
 
