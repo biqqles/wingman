@@ -21,6 +21,7 @@ from functools import partial
 from PyQt5 import QtCore, QtWidgets
 import flint as fl
 
+from ... import config
 from ...widgets.mapview import MapView
 
 
@@ -30,7 +31,7 @@ class ExpandedMap(MapView):
     INITIAL_SIZE = (800, 800)
 
     def __init__(self):
-        super().__init__()
+        super().__init__(url=config.expanded_navmap)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.setWindowFlags(QtCore.Qt.Window)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -67,12 +68,16 @@ class ExpandedMap(MapView):
         """Display an expanded universe map."""
         super().displayUniverse()
         self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.resize(*self.INITIAL_SIZE)
         self.setWindowTitle('Sirius')
-        self.show()
+        self.display()
+
         self.page().runJavaScript(f'wingman.highlightSystem({highlightedSystem!r})')
         try:
             self.displayChanged.disconnect()
         except TypeError:  # raised when no callbacks are connected
             pass
         self.displayChanged.connect(self.hide)
+
+    def onUrlChange(self):
+        """Reimplement to avoid injecting the JS we do with the base class."""
+        self.page().runJavaScript('currentSystemNickname', self.emitDisplayChanged)

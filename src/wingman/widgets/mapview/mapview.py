@@ -120,7 +120,11 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
 
     def displayEntity(self, entity: fl.entities.Entity):
         """Change the displayed object (system or solar) to the given item."""
-        self.displayName(entity.name())
+        # I literally have no idea why this exact logic is required, but it's what works
+        if self.isVisible() or isinstance(entity, fl.entities.Base):
+            self.displayName(entity.name())
+        else:
+            self.setDisplayed(entity.name())
 
     def displayName(self, name: str):
         """Attempt to display a map for `entityName`."""
