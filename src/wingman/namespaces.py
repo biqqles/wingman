@@ -53,7 +53,7 @@ class Configuration(configparser.ConfigParser):
 
             self.urls = self['urls']
             self.navmap = self['urls']['navmap']
-            self.expanded_navmap = self['urls']['expandednavmap']
+            self.expanded_navmap = self['urls']['navmap_expanded']
         except (FileNotFoundError, KeyError):
             logging.warning('Config missing or corrupt, reverting to defaults')
             self.createFile()

@@ -130,10 +130,10 @@ class File(SimpleMenu):
                 .onTrigger(lambda: openUrl(config.urls['rules'])),
 
             SimpleAction('House &laws')
-                .onTrigger(lambda: openUrl(config.urls['houselaws'])),
+                .onTrigger(lambda: openUrl(config.urls['house_laws'])),
 
             SimpleAction('&Player status')
-                .onTrigger(lambda: openUrl(config.urls['playerstatus'])),
+                .onTrigger(lambda: openUrl(config.urls['player_status'])),
 
             SimpleAction('Online &navmap')
                 .onTrigger(lambda: openUrl(config.urls['navmap'])),
@@ -270,7 +270,7 @@ class Help(SimpleMenu):
 
     actions_ = [
         SimpleAction('Visit project thread')
-            .onTrigger(lambda: openUrl(config.urls['projectthread'])),
+            .onTrigger(lambda: openUrl(config.urls['project_thread'])),
         SimpleAction('Visit project repo')
             .onTrigger(lambda: openUrl(config.urls['repo'])),
         SimpleAction('About')

@@ -64,7 +64,7 @@ class Merchant:
 
         # finally, display last settings
         self.selectedSystems = \
-            (items.fl.systems.get(self.config['lastOrigin']), items.fl.systems.get(self.config['lastDestination']))
+            (items.fl.systems.get(self.config['last_origin']), items.fl.systems.get(self.config['last_destination']))
 
     def openUniverseMap(self, selector: QtWidgets.QComboBox):
         """Open the universe map, passing its choice to the given combo box."""
@@ -124,8 +124,8 @@ class Merchant:
         self.widget.mainTable.sortByColumn(1, QtCore.Qt.DescendingOrder)  # sort by 'credits/unit' column
         self.widget.mainTable.selectRow(0)
 
-        self.config['lastOrigin'] = originSystem.nickname
-        self.config['lastDestination'] = destinationSystem.nickname if destinationSystem else ''
+        self.config['last_origin'] = originSystem.nickname
+        self.config['last_destination'] = destinationSystem.nickname if destinationSystem else ''
 
     def swapSystems(self):
         """Swap the currently selected origin and destination systems."""
