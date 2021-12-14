@@ -1,5 +1,5 @@
 :: Prerequisites: Python 3.8 available with "python", "pyrcc5" (installed with PyQt), Nuitka, PyInstaller and Inno Setup 6
-set version=5.0
+set version=5.1
 
 :: compile resources
 pyrcc5 "../../src/resources.qrc" -o "../../src/wingman/resources.py"

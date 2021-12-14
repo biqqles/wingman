@@ -11,7 +11,7 @@ from os.path import expanduser
 
 setup(
     name='wingman',
-    version='5.0',
+    version='5.1',
 
     author='biqqles',
     author_email='biqqles@protonmail.com',

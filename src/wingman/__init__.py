@@ -19,7 +19,7 @@ along with Wingman.  If not, see <http://www.gnu.org/licenses/>.
 This file initialises the application.
 """
 __app__ = 'Wingman'
-__version__ = '5.0'
+__version__ = '5.1'
 __description__ = 'A companion for Discovery Freelancer'
 
 import os
