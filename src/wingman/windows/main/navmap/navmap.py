@@ -101,14 +101,14 @@ class Navmap:
         if self.widget.followRadioButton.isChecked():
             self.mapView.displayName(system)
 
-    def displayInfocard(self, entity_nickname: str):
+    def displayInfocard(self, entityNickname: str):
         """Displays the infocard for the given entity (expected to be either a system or solar)."""
-        if not entity_nickname:
+        if not entityNickname:
             return
 
         self.widget.infocard.clear()
 
-        entity = self.searchableEntities.get(entity_nickname)
+        entity = self.searchableEntities.get(entityNickname)
 
         if entity:
             infocard = entity.infocard().strip()
@@ -117,7 +117,7 @@ class Navmap:
         else:
             self.widget.infocard.insertHtml('<i>No infocard available.</i>')
 
-        self.widget.infocard.insertHtml(f'<hr><small>nickname: {entity_nickname}</small>')
+        self.widget.infocard.insertHtml(f'<hr><small>nickname: {entityNickname}</small>')
 
         self.widget.infocard.verticalScrollBar().setValue(0)  # scroll to top
 
