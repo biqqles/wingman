@@ -57,10 +57,7 @@ class ExpandedMap(MapView):
         """Display an expanded system map."""
         super().displayEntity(entity)
         self.setWindowModality(QtCore.Qt.NonModal)
-        try:
-            self.displayChanged.disconnect()
-        except TypeError:  # raised when no callbacks are connected
-            pass
+        self.disconnectDisplayChanged()
         self.displayChanged.connect(lambda: self.setWindowTitle(self.getDisplayed().title()))
         self.display()
 
@@ -72,12 +69,16 @@ class ExpandedMap(MapView):
         self.display()
 
         self.page().runJavaScript(f'wingman.highlightSystem({highlightedSystem!r})')
-        try:
-            self.displayChanged.disconnect()
-        except TypeError:  # raised when no callbacks are connected
-            pass
+        self.disconnectDisplayChanged()
         self.displayChanged.connect(self.hide)
 
     def onUrlChange(self):
         """Reimplement to avoid injecting the JS we do with the base class."""
         self.page().runJavaScript('currentSystemNickname', self.emitDisplayChanged)
+
+    def disconnectDisplayChanged(self):
+        """Disconnect the displayChanged signal."""
+        try:
+            self.displayChanged.disconnect()
+        except TypeError:  # raised when no callbacks are connected
+            pass
