@@ -42,7 +42,7 @@ class InfocardView(QtWidgets.QTextEdit):
         menu.exec(QtGui.QCursor.pos())
 
     def setInfocard(self, entityNickname, entity):
-        """Display the infocard for the given entity."""
+        """Display the infocard for the given entity (expected to be either a system or solar)."""
         self.clear()
 
         if entity:

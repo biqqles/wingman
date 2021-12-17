@@ -34,13 +34,16 @@ class Navmap:
     """Implements the 'Navmap' tab."""
     def __init__(self, widget: NavmapTab, expandedMap: expandedmap.ExpandedMap):
         """Initialise tab"""
-        self.config = config['navmap']
-        self.searchableEntities = fl.systems + fl.bases
-        self.currentlyDisplayed = self.searchableEntities.get(self.config['last'], self.searchableEntities['li01'])
         self.widget = widget
         self.expandedMap = expandedMap
+
         self.mapView: mapview.MapView = self.widget.navmap
         self.tabWidget: QtWidgets.QTabWidget = self.widget.parent().parent()
+
+        self.config = config['navmap']
+
+        self.searchableEntities = fl.systems + fl.bases
+        self.currentSystem = fl.systems.get(self.config['last']) or fl.systems['li01']
 
         # set up search field with completer
         completer = QtWidgets.QCompleter()
@@ -50,7 +53,7 @@ class Navmap:
         self.widget.searchEdit.setCompleter(completer)
 
         # connections
-        self.mapView.displayChanged.connect(self.onURLChange)
+        self.mapView.displayChanged.connect(self.onDisplayChange)
         self.widget.searchEdit.textEdited.connect(self.onSearchTextEdited)
         # textEdited is only emitted on user input, but completer counts as programmatic
         completer.activated.connect(self.onSearchTextEdited)
@@ -61,8 +64,8 @@ class Navmap:
         self.mapView.expandButton.clicked.connect(self.displayExpandedMap)
         self.widget.universeButton.clicked.connect(self.displayUniverseMap)
 
-        self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentlyDisplayed.name()))
-        self.onURLChange(self.currentlyDisplayed.nickname)
+        self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentSystem.name()))
+        self.onDisplayChange(self.currentSystem.nickname)
 
         if IS_WIN:
             self.widget.followRadioButton.setEnabled(flair.state.running)
@@ -73,16 +76,18 @@ class Navmap:
             flair.events.system_changed.connect(self.onFlairSystemChanged)
             self.widget.followRadioButton.toggled.connect(self.onFollowModeEnabled)
 
-    def onURLChange(self, nickname):
-        self.currentlyDisplayed = self.searchableEntities.get(nickname)
-        self.displayInfocard(nickname)
-        if nickname in self.searchableEntities:
-            self.widget.searchEdit.setText(self.searchableEntities[nickname].name())  # update search field
-            if nickname in fl.systems:
-                system = fl.systems[nickname]
-                self.searchableEntities += system.contents()  # load system contents
-                self.mapView.displayConnMenu(system)
-                self.config['last'] = nickname
+    def onDisplayChange(self, nickname):
+        """Handle the mapview changing."""
+        entity = self.searchableEntities.get(nickname)
+        self.widget.infocard.setInfocard(nickname, entity)
+
+        if entity:
+            self.widget.searchEdit.setText(entity.name())  # update search field
+        if isinstance(entity, fl.entities.System):
+            self.searchableEntities += entity.contents()  # load system contents
+            self.mapView.displayConnMenu(entity)
+            self.currentSystem = entity
+            self.config['last'] = nickname
 
     def onSearchTextEdited(self, query: str):
         """Handle the search field's text being edited by the user."""
@@ -99,15 +104,9 @@ class Navmap:
         if self.widget.followRadioButton.isChecked():
             self.mapView.displayName(system)
 
-    def displayInfocard(self, entityNickname: str):
-        """Displays the infocard for the given entity (expected to be either a system or solar)."""
-        if entityNickname:
-            self.widget.infocard.setInfocard(entityNickname,
-                                             self.searchableEntities.get(entityNickname))
-
     def displayExpandedMap(self):
         """Display an expanded map of the current system."""
-        self.expandedMap.displayEntity(self.currentlyDisplayed)
+        self.expandedMap.displayEntity(self.currentSystem)
 
     def displayUniverseMap(self):
         """Display an expanded universe map. Selecting a system will display it in the main navmap."""
@@ -120,11 +119,3 @@ class Navmap:
         self.mapView.displayEntity(entity)
         self.tabWidget.setCurrentWidget(self.widget)
         self.widget.activateWindow()
-
-    @property
-    def currentSystem(self) -> fl.entities.System:
-        """The system currently being viewed."""
-        if isinstance(self.currentlyDisplayed, fl.entities.System):
-            return self.currentlyDisplayed
-        else:
-            return self.currentlyDisplayed.system()
