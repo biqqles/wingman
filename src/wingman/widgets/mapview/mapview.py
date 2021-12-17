@@ -123,11 +123,11 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
     def displayEntity(self, entity: fl.entities.Entity):
         """Change the displayed object (system or solar) to the given item."""
         # I literally have no idea why this exact logic is required, but it's what works
-        if not self.displayedSomething or self.isVisible() or isinstance(entity, fl.entities.Base):
+        if not self.displayedSomething and self.isVisible():
+            self._setDisplayed(entity.name())
+        else:
             self.displayName(entity.name())
             self.displayedSomething = True
-        else:
-            self.setDisplayed(entity.name())
 
     def displayName(self, name: str):
         """Attempt to display a map for `entityName`."""
@@ -143,7 +143,7 @@ class MapView(QtWebEngineWidgets.QWebEngineView):
         fragment = self.getFragment()
         return fragment.get('q', 'Sirius')
 
-    def setDisplayed(self, entityName: str):
+    def _setDisplayed(self, entityName: str):
         """Set the URL fragment to the display name of an entity, causing it to be displayed (assuming it is in the
         navmap's search array. This is useful for guaranteeing a display update, for example if Wingman's hook may have
         not loaded yet. In most cases, use `displayName`."""

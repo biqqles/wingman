@@ -45,6 +45,9 @@ class Navmap:
         self.searchableEntities = fl.systems + fl.bases
         self.currentSystem = fl.systems.get(self.config['last']) or fl.systems['li01']
 
+        self.mapView.navmapReady.connect(lambda: self.mapView.displayEntity(self.currentSystem))
+        self.onDisplayChange(self.currentSystem.nickname)
+
         # set up search field with completer
         completer = QtWidgets.QCompleter()
         completer.setModel(QtCore.QStringListModel(e.name() for e in self.searchableEntities))
@@ -63,9 +66,6 @@ class Navmap:
         self.mapView.forwardButton.clicked.connect(self.widget.gotoRadioButton.click)
         self.mapView.expandButton.clicked.connect(self.displayExpandedMap)
         self.widget.universeButton.clicked.connect(self.displayUniverseMap)
-
-        self.mapView.navmapReady.connect(lambda: self.mapView.setDisplayed(self.currentSystem.name()))
-        self.onDisplayChange(self.currentSystem.nickname)
 
         if IS_WIN:
             self.widget.followRadioButton.setEnabled(flair.state.running)
